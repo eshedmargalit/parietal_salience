@@ -14,9 +14,10 @@ function datasets = load_experiments(varargin)
 	TrialType = 3;
 
 	datasets = cell(length(experiment_numbers),1);
+	fprintf('Loading experiments. * indicates removal of a blink.\n');
 	for i=1:length(experiment_numbers)
 		exp_num = experiment_numbers(i);
-		fprintf('Loading experiment %d...\n', exp_num);
+		fprintf('\nExperiment %d...\n', exp_num);
 
 		% General loading
 		load_struct = load(sprintf('data/QuitoImagesExp%d/Exp%d.mat',...

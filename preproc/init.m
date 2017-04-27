@@ -52,9 +52,9 @@ function dataset = init(trial_info, fixation_info, trial_type, blink_tbl, im_dir
 
 	% remove trials for which no fixation data were available
 	if size(nofix,1) > 0
-		warning(sprintf(['Fixation data were unavailable for'...
+		fprintf(['\nFixation data were unavailable for'...
 			' %d trials (%.2f%%)!\n'], size(nofix,1),...
-			size(nofix,1)/n_valid_trials * 100));
+			size(nofix,1)/n_valid_trials * 100);
 		trials(nofix) = [];
 	end
 

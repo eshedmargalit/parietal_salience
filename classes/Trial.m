@@ -178,6 +178,10 @@ classdef Trial
 					blink_rows = [blink_rows i];
 				end
 			end
+			n_blinks = length(blink_rows);
+			for i=1:n_blinks
+				fprintf('*');
+			end
 			tbl(blink_rows,:) = [];
 			n_fixations = size(tbl,1);
 
