@@ -95,6 +95,7 @@ classdef Trial
 		function hm = get_heatmap(self)
 			img = imread(self.fname);
 			params = makeGBVSParams;
+			params.levels = [2, 3, 5, 6, 7, 8, 9]; % from Xiaomo
 			saliency_map = gbvs(img, params);
 			hm = heatmap_overlay(img,saliency_map.master_map_resized);
 		end
