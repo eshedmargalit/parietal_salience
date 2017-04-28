@@ -3,7 +3,7 @@
 classdef Trial
 
 	properties
-		% trivial props
+		%% trivial props
 		temp1
 		temp2
 		fixation_on

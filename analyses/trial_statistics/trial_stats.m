@@ -1,4 +1,4 @@
-function stats = trial_stats(trials)
+function [stats, props, titles, ylabels] = trial_stats(trials)
 %TRIAL_STATS produces statistics for relevant fields of the Trial object (see preproc/Trial.m)
 %
 % Inputs
@@ -16,6 +16,11 @@ function stats = trial_stats(trials)
 	props = {'mn_fixation_duration','mn_pupil_size','n_fixations'};
 	titles = {'Fixation Duration (ms)', 'Pupil Size', 'Number of Fixations'};
 	ylabels = titles;
+
+	if isempty(trials) % intended use case: user just wants props
+		stats = [];
+		return;
+	end
 
 	stats = struct();
 	n = length(trials);

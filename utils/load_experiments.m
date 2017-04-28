@@ -43,4 +43,5 @@ function datasets = load_experiments(varargin)
 		datasets{i} = init(trial_info,fixation_info,TrialType,...
 			blink_tbl,im_dir,name);
 	end
+	fprintf('\n');
 end
