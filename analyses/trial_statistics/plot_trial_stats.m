@@ -16,7 +16,8 @@ function plot_trial_stats(control_stats, inactivation_stats)
 end
 
 function bare(x1,x2,p)
-	figure; hold on;
+	figure;
+	hold on;
 	bar(1, x1.mn, 0.5, 'FaceColor', [.910 .302 .239],...
 		'EdgeColor', [.659 .082 .024],'LineWidth',1.5);
 	errorbar(1, x1.mn, x1.sem, 'k.','LineWidth',1.5);

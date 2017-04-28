@@ -1,4 +1,4 @@
-function dataset = init(trial_info, fixation_info, trial_type, blink_tbl, im_dir)
+function dataset = init(trial_info, fixation_info, trial_type, blink_tbl, im_dir, name)
 %INIT filters fixation info table by experiment number and reward, return DataSet Object
 %
 % Inputs
@@ -58,5 +58,5 @@ function dataset = init(trial_info, fixation_info, trial_type, blink_tbl, im_dir
 		trials(nofix) = [];
 	end
 
-	dataset = DataSet(trials,trial_info,fixation_info,blink_tbl);
+	dataset = DataSet(trials,trial_info,fixation_info,blink_tbl,name);
 end

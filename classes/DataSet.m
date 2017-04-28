@@ -7,18 +7,21 @@ classdef DataSet
 		trial_info
 		fixation_info
 		blink_tbl
+
+		name 
 	end
 
 	methods
 		% Constructor
 		function obj = DataSet(trials, trial_info,...
-			fixation_info, blink_tbl)
+			fixation_info, blink_tbl, name)
 
 			obj.trials = trials;
 			obj.n_trials = length(trials);
 			obj.trial_info = trial_info;
 			obj.fixation_info = fixation_info;
 			obj.blink_tbl = blink_tbl;
+			obj.name = name;
 		end
 
 		% get some subset of trials

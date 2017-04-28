@@ -6,7 +6,8 @@ function plot_m_seqs(control, inactivation)
 	end
 	
 	%% Shaded bars
-	figure; hold on;
+	%figure; hold on;
+	hold on;
 	h1 = shadedErrorBar(control.binned_distances,...
 		control.binned_durations.mn,...
 		control.binned_durations.sem,...

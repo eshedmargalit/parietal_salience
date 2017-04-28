@@ -17,6 +17,7 @@ function datasets = load_experiments(varargin)
 	fprintf('Loading experiments. * indicates removal of a blink.\n');
 	for i=1:length(experiment_numbers)
 		exp_num = experiment_numbers(i);
+		name = sprintf('Experiment %d',exp_num);
 		fprintf('\nExperiment %d...\n', exp_num);
 
 		% General loading
@@ -36,7 +37,10 @@ function datasets = load_experiments(varargin)
 			blink_tbl = load_struct.EBLINKAll;
 		end
 
-		im_dir = sprintf('data/QuitoImagesExp%d/All%d',exp_num, exp_num);
-		datasets{i} = init(trial_info,fixation_info,TrialType,blink_tbl,im_dir);
+		im_dir = sprintf('data/QuitoImagesExp%d/All%d',...
+			exp_num, exp_num);
+
+		datasets{i} = init(trial_info,fixation_info,TrialType,...
+			blink_tbl,im_dir,name);
 	end
 end
