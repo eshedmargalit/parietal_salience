@@ -18,7 +18,10 @@ function m_seq_wrapper(datasets, mode, varargin)
 
 		for i = 1:n_d
 			ds = datasets{i};
-			%figure('units','normalized','outerposition',[.1+randn() .1+randn() .5 .5])
+			%figure('units','normalized','outerposition',...
+			%	[.1+randn() .1+randn() .5 .5]) % uncomment...
+			%	% to randomize location of figure plots
+
 			figure(i);
 			title(ds.name);
 			control_trials = ds.get_trials('control');
@@ -28,8 +31,6 @@ function m_seq_wrapper(datasets, mode, varargin)
 			inactivation_seq = m_seq(inactivation_trials, n_bins); 
 
 			plot_m_seqs(control_seq, inactivation_seq);
-			%pause(2);
-			%close all;
 		end
 	end
 end

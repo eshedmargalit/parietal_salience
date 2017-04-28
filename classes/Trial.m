@@ -195,6 +195,9 @@ classdef Trial
 			x0s = fix0.XPosition;
 			y0s = fix0.YPosition;
 
+			% if any fixations meet the criteria after blink
+			% removal, use the mean. If not, use the
+			% first entry in the table 
 			if size(fix0,1) == 0
 				x0 = tbl.XPosition(1);
 				y0 = tbl.YPosition(1);
