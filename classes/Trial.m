@@ -85,6 +85,56 @@ classdef Trial < handle
 				./ sqrt(obj.n_fixations);
 		end
 
+		function retval = get_fixations(obj, varargin)
+			if length(varargin) > 1
+				error('Too many arguments. 1 argument expected');
+			elseif length(varargin) == 0
+				direction = '';
+			else
+				direction = varargin{1};
+			end
+
+
+			if strcmp(direction,'') 
+				retval = obj.fixations;
+			else
+				retval = {};
+				for i = 1:obj.n_fixations
+					f = obj.fixations{i}
+					if isempty(f.prev_saccade)
+						continue;
+					end
+
+					if strcmp(direction, f.prev_saccade.direction)
+						retval = [retval; {f}];
+					end
+				end
+			end
+		end
+
+		function retval = get_saccades(obj, varargin)
+			if length(varargin) > 1
+				error('Too many arguments. 1 argument expected');
+			elseif length(varargin) == 0
+				direction = '';
+			else
+				direction = varargin{1};
+			end
+
+
+			if strcmp(direction,'') 
+				retval = obj.saccades;
+			else
+				retval = {};
+				for i = 1:obj.n_saccades
+					s = obj.saccades{i}
+					if strcmp(direction, s.direction)
+						retval = [retval; {s}];
+					end
+				end
+			end
+		end
+
 		% plots image and saliency map
 		function hm = get_heatmap(self)
 			img = imread(self.fname);
@@ -194,10 +244,10 @@ classdef Trial < handle
 					obj.fixations{fix_idx}.next_saccade = ...
 						obj.saccades{fix_idx};
 					obj.fixations{fix_idx}.prev_saccade = ...
-						NaN;
+						[];
 				elseif fix_idx == obj.n_fixations
 					obj.fixations{fix_idx}.next_saccade = ...
-						NaN;
+						[];
 					obj.fixations{fix_idx}.prev_saccade = ...
 						obj.saccades{fix_idx-1};	
 				else
@@ -260,7 +310,7 @@ classdef Trial < handle
 			for i = 1:n_fixations
 				fixations{i} = Fixation(fix_tbl(i,:),x0,y0);
 			end
-			obj.fixations = fixations;
+			obj.fixations = fixations';
 		end
 
 		function saccades = compute_saccades(obj)
