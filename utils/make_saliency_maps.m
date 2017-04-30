@@ -1,21 +1,32 @@
-directory = 'QuitoImagesExp2/All2';
-listing = dir(fullfile(sprintf('%s/*.jpg',directory)));
-files = {listing.name};
-n_files = length(files);
+experiments = 2:11;
 
-for i = 1:n_files
-	fname = sprintf('%s/%s',directory,files{i});
-	im = imread(fname);
-	saliency_map = gbvs(im);
+for e = 1:length(experiments)
+	exp_num = experiments(e);
 
-	base = files{i};
-	base = base(1:end-4);
-	outname = sprintf('QuitoImagesExp2/Saliency_Map_Files/%s.mat',base);
-	im_outname = sprintf('QuitoImagesExp2/Saliency_Maps/%s.jpg',base);
+	in_dir = sprintf('data/QuitoImagesExp%d/All%d',exp_num,exp_num);
+	out_dir = sprintf('data/QuitoImagesExp%d/saliency_maps',exp_num);
+	mkdir(out_dir);
 
+	fprintf('Creating saliency maps for %s\n',in_dir);
 
-	save(outname,'im','saliency_map');
-	overlay = heatmap_overlay(im,saliency_map.master_map_resized);
-	imwrite(overlay,im_outname);
+	listing = dir(fullfile(sprintf('%s/*.jpg',in_dir)));
+	files = {listing.name};
+	n_files = length(files);
+
+	for i = 1:n_files
+		fprintf('%d...',i);
+		fname = sprintf('%s/%s',in_dir,files{i});
+		im = imread(fname);
+
+		params = makeGBVSParams;
+		params.levels = [2, 3, 5, 6, 7, 8, 9]; % from Xiaomo
+		saliency_map = gbvs(im, params);
+
+		base = files{i};
+		base = base(1:end-4);
+		im_outname = sprintf('%s/gbvs_%s.jpg',out_dir,base);
+
+		imwrite(saliency_map.master_map_resized,im_outname);
+	end
+	fprintf('\n\n');
 end
-
