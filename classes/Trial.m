@@ -1,6 +1,6 @@
 % Eshed Margalit
 % April 24, 2017
-classdef Trial
+classdef Trial < handle
 
 	properties
 		%% trivial props
@@ -37,37 +37,31 @@ classdef Trial
 			im_dir)
 
 			% trivial initialization
-			obj.temp1 = trial_info.Temperature1;
-			obj.temp2 = trial_info.Temperature2;
-			obj.fixation_on = trial_info.FixationOn;
-			obj.fixation_in = trial_info.FixationIn;
-			obj.figure_number = trial_info.FigureNum;
-			obj.image_on = trial_info.ImageOn;
-			obj.image_end = trial_info.ImageEnd;
-
+			trivial_init(obj, trial_info);
 			obj.im_dir = im_dir;
 
 			% classify trial type based on maximum of two temps
-			max_temp = max(obj.temp1, obj.temp2);
-			if max_temp < -30000 || max_temp > 30 
-				obj.condition = 'control';
-			else
-				obj.condition = 'inactivation';
-			end
+			assign_condition(obj);
 
 			% store image filename
 			obj.fname = sprintf('%s/A%d.jpg',obj.im_dir,...
 				obj.figure_number);
 
 			%% Parse fixation table
-			obj.fixations = Trial.parse_fixation_table(fixation_table,...
-				obj.fixation_on,obj.image_on,blink_tbl);	
-			obj.saccades = Trial.compute_saccades(obj.fixations);
+			parse_fixation_table(obj,fixation_table,blink_tbl);	
+			compute_saccades(obj);
 
 			obj.n_fixations = length(obj.fixations);
 			obj.n_saccades = obj.n_fixations - 1;
 
+			% assign saccades to fixations
+			assign_fixations_saccades(obj);
+
 			% Compute some statistics of fixation table
+			compute_fixation_statistics(obj);
+		end
+
+		function compute_fixation_statistics(obj)
 			durations = zeros(obj.n_fixations,1);
 			pupil_sizes = zeros(obj.n_fixations,1);
 			for i = 1:obj.n_fixations
@@ -100,6 +94,29 @@ classdef Trial
 			hm = heatmap_overlay(img,saliency_map.master_map_resized);
 		end
 
+		function compute_fixation_salience(self)
+			img = imread(self.fname);
+			params = makeGBVSParams;
+			params.levels = [2, 3, 5, 6, 7, 8, 9]; % from Xiaomo
+			saliency_map = gbvs(img, params);
+
+			% assign salience to each fix
+			for f = 1:length(self.fixations)
+				x = floor(self.fixations{f}.x);
+				y = floor(self.fixations{f}.y);
+				self.fixations{f}.salience = saliency_map.master_map_resized(y,x);
+			end
+		end
+
+		function assign_condition(obj)
+			max_temp = max(obj.temp1, obj.temp2);
+			if max_temp < -30000 || max_temp > 30 
+				obj.condition = 'control';
+			else
+				obj.condition = 'inactivation';
+			end
+		end
+
 		% plot image and raw fixation points
 		function plot_fixations(self, mode)
 			
@@ -117,8 +134,8 @@ classdef Trial
 					fx = fix.x;
 					fy = fix.y;
 				case 'centered'
-					fx = fix.dx + 1920/2;
-					fy = fix.dy + 1080/2;
+					fx = fix.cx;
+					fy = fix.cy;
 				otherwise
 					error('Mode must be ''centered'' or ''raw''');
 				end
@@ -137,32 +154,64 @@ classdef Trial
 			end
 		end
 
-		function plot_fixation_heatmap(self, mode)
+		% plot image and raw fixation points
+		function lr_test(obj)
 			
-			for i = 1:self.n_fixations
-				fix = fixations{i};
-				switch mode
-				case 'raw'
-					fx = fix.x;
-					fy = fix.y;
-				case 'centered'
-					fx = fix.dx + 1920/2;
-					fy = fix.dy + 1080/2;
-				otherwise
-					error('Mode must be ''centered'' or ''raw''');
-				end
+			% compute heatmap overlay
+			hm = obj.get_heatmap();
+			imshow(hm); hold on;
+			
+			saccades = obj.saccades;
 
-				% approach: create gaussian at each location, then sum?
+			for i = 1:obj.n_saccades
+				sac = saccades{i};
+
+				color = 'r';
+				if strcmp(sac.direction, 'left')
+					color = 'b';
+				end
+				
+				plot([sac.xs(1), sac.xs(2)],...
+					[sac.ys(1), sac.ys(2)],...
+					'Color',color,...
+					'LineWidth',3);
 			end
 		end
-	end
 
+		function trivial_init(obj, trial_info)
+			obj.temp1 = trial_info.Temperature1;
+			obj.temp2 = trial_info.Temperature2;
+			obj.fixation_on = trial_info.FixationOn;
+			obj.fixation_in = trial_info.FixationIn;
+			obj.figure_number = trial_info.FigureNum;
+			obj.image_on = trial_info.ImageOn;
+			obj.image_end = trial_info.ImageEnd;
+		end
 
-	methods (Static)
-		function fixations = parse_fixation_table(tbl,fixation_on,...
-			image_on,blink_tbl)
+		function assign_fixations_saccades(obj)
+			for fix_idx = 1:obj.n_fixations
+				if fix_idx == 1
+					obj.fixations{fix_idx}.next_saccade = ...
+						obj.saccades{fix_idx};
+					obj.fixations{fix_idx}.prev_saccade = ...
+						NaN;
+				elseif fix_idx == obj.n_fixations
+					obj.fixations{fix_idx}.next_saccade = ...
+						NaN;
+					obj.fixations{fix_idx}.prev_saccade = ...
+						obj.saccades{fix_idx-1};	
+				else
+					obj.fixations{fix_idx}.next_saccade = ...
+						obj.saccades{fix_idx};
+					obj.fixations{fix_idx}.prev_saccade = ...
+						obj.saccades{fix_idx-1};	
+				end
+			end
+		end
+
+		function parse_fixation_table(obj,fix_tbl,blink_tbl)
 			% scrub any fixation within 100ms of blink
-			n_fixations = size(tbl,1);
+			n_fixations = size(fix_tbl,1);
 			blink_on = blink_tbl(:,3);
 			blink_off = blink_tbl(:,3);
 			cut_early = blink_on - 100;
@@ -170,7 +219,7 @@ classdef Trial
 
 			blink_rows = [];
 			for i = 1:n_fixations
-				fix = tbl(i,:);
+				fix = fix_tbl(i,:);
 				after_cut_early = cut_early < fix.FixationStart;
 				before_cut_late = cut_late > fix.FixationEnd;
 				both = after_cut_early .* before_cut_late;
@@ -182,15 +231,15 @@ classdef Trial
 			for i=1:n_blinks
 				fprintf('*');
 			end
-			tbl(blink_rows,:) = [];
-			n_fixations = size(tbl,1);
+			fix_tbl(blink_rows,:) = [];
+			n_fixations = size(fix_tbl,1);
 
 			% determine x0,y0: monkey's fixation point before image appears
-			starts_after_fixation = tbl.FixationStart >= fixation_on;
-			ends_before_image_onset = tbl.FixationEnd <= image_on;
+			starts_after_fixation = fix_tbl.FixationStart >= obj.fixation_on;
+			ends_before_image_onset = fix_tbl.FixationEnd <= obj.image_on;
 			intersection = (starts_after_fixation .* ends_before_image_onset);
 			baseline_fixation_indices = find(intersection);
-			fix0 = tbl(baseline_fixation_indices,:);
+			fix0 = fix_tbl(baseline_fixation_indices,:);
 
 			x0s = fix0.XPosition;
 			y0s = fix0.YPosition;
@@ -199,8 +248,8 @@ classdef Trial
 			% removal, use the mean. If not, use the
 			% first entry in the table 
 			if size(fix0,1) == 0
-				x0 = tbl.XPosition(1);
-				y0 = tbl.YPosition(1);
+				x0 = fix_tbl.XPosition(1);
+				y0 = fix_tbl.YPosition(1);
 			else
 				x0 = mean(x0s);
 				y0 = mean(y0s);
@@ -209,17 +258,20 @@ classdef Trial
 			% Initialize all fixations
 			fixations = {};
 			for i = 1:n_fixations
-				fixations{i} = Fixation(tbl(i,:),x0,y0);
+				fixations{i} = Fixation(fix_tbl(i,:),x0,y0);
 			end
+			obj.fixations = fixations;
 		end
 
-		function saccades = compute_saccades(fixations)
-			saccades = cell(length(fixations)-1,1);
-			for f = 2:length(fixations)
-				fix1 = fixations{f-1};
-				fix2 = fixations{f};
+		function saccades = compute_saccades(obj)
+			
+			saccades = cell(length(obj.fixations)-1,1);
+			for f = 2:length(obj.fixations)
+				fix1 = obj.fixations{f-1};
+				fix2 = obj.fixations{f};
 				saccades{f-1} = Saccade(fix1,fix2);
 			end
+			obj.saccades = saccades;
 		end
 	end
 end
