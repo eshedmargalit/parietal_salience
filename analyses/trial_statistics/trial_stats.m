@@ -1,8 +1,10 @@
-function [stats, props, titles, ylabels] = trial_stats(trials)
+function [stats, props, titles, ylabels] = trial_stats(trials, direction, label)
 %TRIAL_STATS produces statistics for relevant fields of the Trial object (see preproc/Trial.m)
 %
 % Inputs
 %	trials - a cell array of Trial objects to be summarized
+%	direction - '', 'left', or 'right'
+%	str - a label to be used on figures
 %
 % Outputs
 %	stats - a struct of structs, each represeting a property of Trial 
@@ -10,10 +12,8 @@ function [stats, props, titles, ylabels] = trial_stats(trials)
 % Eshed Margalit
 % April 25, 2017
 
-
 	% create list of all fields to compute statistics on
-	%props = {'temp1','temp2','mn_fixation_duration','mn_pupil_size','n_fixations'};
-	props = {'mn_fixation_duration','mn_pupil_size','n_fixations'};
+	props = {'fixation_durations_mn','pupil_sizes_mn','n_fixations'};
 	titles = {'Fixation Duration (ms)', 'Pupil Size', 'Number of Fixations'};
 	ylabels = titles;
 
@@ -34,10 +34,11 @@ function [stats, props, titles, ylabels] = trial_stats(trials)
 
 	for i = 1:n
 		trial = trials{i};
+		tstats = trial.get_stats(direction);
 
 		for s = 1:numel(props)
 			str = props{s};
-			stats.(str).raw(i) = trial.(str);
+			stats.(str).raw(i) = tstats.(str);
 		end
 	end
 
@@ -51,4 +52,5 @@ function [stats, props, titles, ylabels] = trial_stats(trials)
 		stats.(str).title = titles{s};
 		stats.(str).ylabel = ylabels{s};
 	end
+	stats.label = label;
 end

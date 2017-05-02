@@ -1,4 +1,4 @@
-function summaries = aggregate_stat_summaries(datasets, mode)
+function summaries = aggregate_stat_summaries(datasets, mode, direction, label)
 	% the summaries struct needs to include: raw, mn, md, sd, sem, title, ylabel 
 
 	% from trial_stats, get the properties that matter
@@ -25,7 +25,8 @@ function summaries = aggregate_stat_summaries(datasets, mode)
 			tmp = zeros(length(trials),1);
 			for t = 1:length(trials)
 				trial = trials{t};
-				tmp(t) = trial.(str);
+				tstats = trial.get_stats(direction);
+				tmp(t) = tstats.(str);
 			end
 
 			summaries.(str).raw(d) = mean(tmp);
@@ -41,5 +42,6 @@ function summaries = aggregate_stat_summaries(datasets, mode)
 			sqrt(n);
 		summaries.(str).title = titles{p};
 		summaries.(str).ylabel = ylabels{p};
+		summaries.label = label;
 	end
 end

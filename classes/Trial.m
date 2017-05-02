@@ -20,12 +20,6 @@ classdef Trial < handle
 		fixations
 		n_fixations
 
-		pupil_sizes
-		fixation_durations
-
-		mn_fixation_duration
-		mn_pupil_size
-
 		% saccades
 		saccades
 		n_saccades
@@ -56,33 +50,42 @@ classdef Trial < handle
 
 			% assign saccades to fixations
 			assign_fixations_saccades(obj);
-
-			% Compute some statistics of fixation table
-			compute_fixation_statistics(obj);
 		end
 
-		function compute_fixation_statistics(obj)
-			durations = zeros(obj.n_fixations,1);
-			pupil_sizes = zeros(obj.n_fixations,1);
-			for i = 1:obj.n_fixations
-				durations(i) = obj.fixations{i}.duration;
-				pupil_sizes(i) = obj.fixations{i}.pupil;
+		function stats = get_stats(self, direction)
+			% direction can be '', 'left', or 'right'
+
+			fixations = self.get_fixations(direction);
+
+			stats = struct();
+			stats.n_fixations = length(fixations);
+
+			durations = zeros(stats.n_fixations,1);
+			pupil_sizes = zeros(stats.n_fixations,1);
+
+			for i = 1:stats.n_fixations
+				durations(i) = fixations{i}.duration;
+				pupil_sizes(i) = fixations{i}.pupil;
 			end
 
-			obj.fixation_durations = struct();
-			obj.fixation_durations.mn = mean(durations); 
-				obj.mn_fixation_duration = mean(durations);
+			% Fixation durations
+			stats.fixation_durations = struct();
+			stats.fixation_durations.mn = mean(durations); 
+			stats.fixation_durations.sd = std(durations);
+			stats.fixation_durations.sem = stats.fixation_durations.sd...
+				./ sqrt(stats.n_fixations);
 
-			obj.fixation_durations.sd = std(durations);
-			obj.fixation_durations.sem = obj.fixation_durations.sd...
-				./ sqrt(obj.n_fixations);
+			% Pupil sizes
+			stats.pupil_sizes = struct();
+			stats.pupil_sizes.mn = mean(pupil_sizes);
+			stats.pupil_sizes.sd = std(pupil_sizes);
+			stats.pupil_sizes.sem = stats.pupil_sizes.sd...
+				./ sqrt(stats.n_fixations);
 
-			obj.pupil_sizes = struct();
-			obj.pupil_sizes.mn = mean(pupil_sizes);
-				obj.mn_pupil_size = mean(pupil_sizes);
-			obj.pupil_sizes.sd = std(pupil_sizes);
-			obj.pupil_sizes.sem = obj.pupil_sizes.sd...
-				./ sqrt(obj.n_fixations);
+			% For ease of access, store means separately
+			stats.fixation_durations_mn = stats.fixation_durations.mn;
+			stats.pupil_sizes_mn = stats.pupil_sizes.mn;
+
 		end
 
 		function retval = get_fixations(obj, varargin)
@@ -100,7 +103,7 @@ classdef Trial < handle
 			else
 				retval = {};
 				for i = 1:obj.n_fixations
-					f = obj.fixations{i}
+					f = obj.fixations{i};
 					if isempty(f.prev_saccade)
 						continue;
 					end
