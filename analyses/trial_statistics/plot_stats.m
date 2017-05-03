@@ -1,6 +1,13 @@
-function plot_stats(statvec, ttest_pairs)
+function plot_stats(statvec, ttest_pairs, varargin)
 % statvec is a cell array of statistic objects to plot
 % ttest_pairs is an nx2 matrix of stats in statvec to compare
+
+
+	if length(varargin) == 0
+		colors = hsv(4);
+	else
+		colors = varargin{1};
+	end
 
 	fields = fieldnames(statvec{1});	
 	n_fields = length(fields);
@@ -21,14 +28,15 @@ function plot_stats(statvec, ttest_pairs)
 		end
 
 		% perform t-tests for indicated pairs
+		fprintf('\n%s\n---------------\n',field);
 		ps = do_ttests(xs, ttest_pairs, strs);
 
-		bare(xs,ps,ttest_pairs,strs);
+		bare(xs,ps,ttest_pairs,strs,colors);
 	end
 end
 
 
-function bare(xs,ps,ttest_pairs,strs)
+function bare(xs,ps,ttest_pairs,strs,colors)
 	figure;
 	hold on;
 
@@ -41,7 +49,8 @@ function bare(xs,ps,ttest_pairs,strs)
 
 		means(i) = x.mn;
 
-		bar(i, x.mn, 0.5,'LineWidth',1.5);
+		bar(i, x.mn, 0.5,'LineWidth',1.5,...
+			'FaceColor',colors(i,:));
 		errorbar(i, x.mn, x.sem, 'k.','LineWidth',1.5);
 
 		ylabel(x.ylabel);
@@ -62,7 +71,8 @@ function bare(xs,ps,ttest_pairs,strs)
 		idx1 = ttest_pairs(i,1);
 		idx2 = ttest_pairs(i,2);
 
-		height = upper_lim * .95 + (i * upper_lim/100);
+		height = upper_lim * .90 + (i * upper_lim/50);
+		txt_height = height * 1.01;
 		plot([idx1, idx2],[height, height], 'k-',...
 			'LineWidth',3);
 
@@ -75,7 +85,7 @@ function bare(xs,ps,ttest_pairs,strs)
 		elseif p < .05
 			starstr = '*';
 		end
-		text(mean([idx1, idx2]), height, starstr, 'FontSize', 24);
+		text(mean([idx1, idx2]), txt_height, starstr, 'FontSize', 24);
 	end
 
 end

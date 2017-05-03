@@ -1,5 +1,11 @@
 function trial_stats_wrapper(datasets, mode)
 
+	blue = [.161, .310, .427];
+	red = [.667, .224, .224];
+
+	colors4 = [red; red; blue; blue];
+	colors2 = [red; blue];
+
 	switch mode
 	case 'aggregate'
 		% Warning: this mode of aggregation is statistically invalid, it
@@ -22,7 +28,7 @@ function trial_stats_wrapper(datasets, mode)
 			inactivation_left_stats, inactivation_right_stats};
 
 		pairs = [1 3; 2 4];
-		plot_stats(statvec, pairs);
+		plot_stats(statvec, pairs, colors4);
 		
 	case 'aggregate_summaries'
 		% aggregates the means of each dataset and constructs 
@@ -42,7 +48,7 @@ function trial_stats_wrapper(datasets, mode)
 			inactivation_left_stats, inactivation_right_stats};
 
 		pairs = [1 3; 2 4];
-		plot_stats(statvec, pairs);
+		plot_stats(statvec, pairs, colors4);
 
 	otherwise
 		% standard case, plot separately for each dataset,
@@ -74,7 +80,7 @@ function trial_stats_wrapper(datasets, mode)
 				inactivation_left_stats,...
 				inactivation_right_stats};
 				pairs = [1 3; 2 4];
-				plot_stats(statvec, pairs);
+				plot_stats(statvec, pairs,colors4);
 			else
 				control_left_stats = trial_stats(...
 					control_trials,'left',...
@@ -86,7 +92,7 @@ function trial_stats_wrapper(datasets, mode)
 				statvec = {control_left_stats,...
 				control_right_stats};
 				pairs = [1 2];
-				plot_stats(statvec, pairs);
+				plot_stats(statvec, pairs, colors2);
 			end
 
 		end
