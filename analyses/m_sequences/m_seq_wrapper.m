@@ -1,5 +1,16 @@
 function m_seq_wrapper(datasets, mode, varargin)
 
+	blue = [.161, .310, .427];
+	red = [.667, .224, .224];
+
+	colors4 = [red; red; blue; blue];
+	colors2 = [red; blue];
+	markers4 = {'-<','-o','-<','-o'};
+	markers2 = {'-<','-o'};
+	strs4 = {'Control-Left','Control-Right',...
+		'Inactivation-Left','Inactivation-Right'};
+	strs2 = strs4(1:2);
+
 	if ~isempty(varargin)
 		n_bins = varargin{1};
 	else
@@ -9,10 +20,23 @@ function m_seq_wrapper(datasets, mode, varargin)
 	if strcmp(mode, 'aggregate')
 		control_trials = aggregate_trials(datasets,'control');
 		inactivation_trials = aggregate_trials(datasets,'inactivation');
-		control_seq = m_seq(control_trials, n_bins); 
-		inactivation_seq = m_seq(inactivation_trials, n_bins); 
 
-		plot_m_seqs(control_seq, inactivation_seq);
+		control_seq_left = m_seq(control_trials, ...
+			'left', n_bins); 
+		inactivation_seq_left = m_seq(inactivation_trials, ...
+			'left', n_bins); 
+
+		control_seq_right = m_seq(control_trials, ...
+			'right', n_bins); 
+		inactivation_seq_right = m_seq(inactivation_trials, ...
+			'right', n_bins); 
+
+		seqvec = {control_seq_left,...
+			control_seq_right,...
+			inactivation_seq_left,...
+			inactivation_seq_right};
+
+		plot_m_seqs(seqvec, colors4, markers4, strs4);
 	else
 		n_d = length(datasets);
 
@@ -27,10 +51,35 @@ function m_seq_wrapper(datasets, mode, varargin)
 			control_trials = ds.get_trials('control');
 			inactivation_trials = ds.get_trials('inactivation');
 
-			control_seq = m_seq(control_trials, n_bins); 
-			inactivation_seq = m_seq(inactivation_trials, n_bins); 
+			if (size(inactivation_trials,1) > 0)
+				control_seq_left = m_seq(control_trials, ...
+					'left', n_bins); 
+				inactivation_seq_left = m_seq(inactivation_trials, ...
+					'left', n_bins); 
 
-			plot_m_seqs(control_seq, inactivation_seq);
+				control_seq_right = m_seq(control_trials, ...
+					'right', n_bins); 
+				inactivation_seq_right = m_seq(inactivation_trials, ...
+					'right', n_bins); 
+
+				seqvec = {control_seq_left,...
+					control_seq_right,...
+					inactivation_seq_left,...
+					inactivation_seq_right};
+
+				plot_m_seqs(seqvec, colors4, markers4, strs4);
+			else
+				control_seq_left = m_seq(control_trials, ...
+					'left', n_bins); 
+
+				control_seq_right = m_seq(control_trials, ...
+					'right', n_bins); 
+
+				seqvec = {control_seq_left,...
+					control_seq_right};
+
+				plot_m_seqs(seqvec, colors2, markers2, strs2);
+			end
 		end
 	end
 end

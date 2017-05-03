@@ -130,7 +130,7 @@ classdef Trial < handle
 			else
 				retval = {};
 				for i = 1:obj.n_saccades
-					s = obj.saccades{i}
+					s = obj.saccades{i};
 					if strcmp(direction, s.direction)
 						retval = [retval; {s}];
 					end

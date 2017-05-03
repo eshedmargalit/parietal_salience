@@ -1,47 +1,52 @@
-function plot_m_seqs(control, inactivation)
+function plot_m_seqs(seqvec, varargin)
 % PLOT_M_SEQS plots the m sequences for control and inactivation sequence structs
 
-	if nargin < 2
-		error('Please supply control and inactivation sequence structs');
+
+	n = numel(seqvec);
+	%h = cell(n*2,1); % each sequence needs a mean handle and a raw handle
+	h = cell(n,1); 
+
+	if length(varargin) == 0
+		colors = hsv(n);
+		markers = {'-<','-o','-<','-o'};
+		markers = markers(1:n);
+		strs = {'Control-Left','Control-Right',...
+			'Inactivation-Left','Inactivation-Right'};
+		strs = strs(1:n);
+	else
+		colors = varargin{1};
+		markers = varargin{2};
+		strs = varargin{3};
 	end
-	
-	%% Shaded bars
-	%figure; hold on;
+
 	hold on;
-	h1 = shadedErrorBar(control.binned_distances,...
-		control.binned_durations.mn,...
-		control.binned_durations.sem,...
-		{'r-'},1);
+	legend_entries = [];
+	for i=1:n
+		seq = seqvec{i};
 
-	h2 = shadedErrorBar(inactivation.binned_distances,...
-		inactivation.binned_durations.mn,...
-		inactivation.binned_durations.sem,...
-		{'b-'},1);
+		%% Shaded bars
 
-	h1p = h1.patch;
-	h2p = h2.patch;
+		h{i} = shadedErrorBar(seq.binned_distances,...
+			seq.binned_durations.mn,...
+			seq.binned_durations.sem,...
+			{markers{i},'color',colors(i,:)},1);
 
+		p = h{i}.patch;
+		legend_entries(i) = h{i}.mainLine;
 
-	% scatterplots in background
-	h3 = scatter(control.distances.raw,...
-		control.durations.raw,...
-		1,...
-		'MarkerEdgeColor', 'r',...
-		'MarkerEdgeAlpha', 0.05);
+		% scatterplots in background
+		%h{n+i} = scatter(seq.distances.raw,...
+			%seq.durations.raw,...
+			%1,...
+			%markers{i}(end),...
+			%'MarkerEdgeColor', colors(i,:),...
+			%'MarkerEdgeAlpha', 0.05);
 
-	h4 = scatter(inactivation.distances.raw,...
-		inactivation.durations.raw,...
-		1,...
-		'MarkerEdgeColor', 'b',...
-		'MarkerEdgeAlpha', 0.05);
-
-	ylim([0 200]);
-	xlim([0 800]);
-
-	legend([h1p,h2p,h3,h4],{'Control','Inactivation','Control Raw',...
-		'Inactivation Raw'});
+		ylim([0 175]);
+		xlim([0 800]);
+	end
+	legend(legend_entries,strs);
 
 	xlabel('Saccade Distance (px)');
 	ylabel('Saccade Duration (ms)');
-
 end

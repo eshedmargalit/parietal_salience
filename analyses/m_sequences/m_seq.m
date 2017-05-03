@@ -1,14 +1,18 @@
-function sequence = m_seq(trials,n_bins);
+function sequence = m_seq(trials, direction, n_bins);
 %M_SEQ aggregates saccades from provided trials and computes m-sequence
 %
 % Inputs
 %	trials - a cell array of Trial objects to be summarized
+%	direction - which saccades to use. Valid values are '', 'left', 'right' 
+%	n_bins - how many bins to discretize durations by
 %
 % Outputs
-%	sequence - 
+%	sequence - struct with fields:
+%		+ (binned) distances: statistics for saccade distances
+%		+ (binned) durations: statistics for saccade durations
 %
 % Eshed Margalit
-% April 27, 2017
+% April 27, 2017 | Last Modified: May 3, 2017
 
 	% aggregate
 	n = length(trials);
@@ -16,7 +20,7 @@ function sequence = m_seq(trials,n_bins);
 	dists = [];
 	durs = []; 
 	for i = 1:n
-		saccades = trials{i}.saccades;
+		saccades = trials{i}.get_saccades(direction);
 		for s = 1:length(saccades)
 			sac = saccades{s};
 
