@@ -73,8 +73,16 @@ function bare(xs,ps,ttest_pairs,strs,colors)
 
 		height = upper_lim * .90 + (i * upper_lim/50);
 		txt_height = height * 1.01;
+
+		% top bar
 		plot([idx1, idx2],[height, height], 'k-',...
-			'LineWidth',3);
+			'LineWidth',2);
+
+		% legs
+		plot([idx1 idx1],[height-upper_lim/150, height],'k-',...
+			'LineWidth',2);
+		plot([idx2 idx2],[height-upper_lim/150, height],'k-',...
+			'LineWidth',2);
 
 		p = ps(i);
 		starstr = 'n.s.';

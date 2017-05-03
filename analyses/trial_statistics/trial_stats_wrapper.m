@@ -27,7 +27,7 @@ function trial_stats_wrapper(datasets, mode)
 		statvec = {control_left_stats, control_right_stats,...
 			inactivation_left_stats, inactivation_right_stats};
 
-		pairs = [1 3; 2 4];
+		pairs = [1 3; 2 4; 1 2; 3 4];
 		plot_stats(statvec, pairs, colors4);
 		
 	case 'aggregate_summaries'
@@ -47,7 +47,8 @@ function trial_stats_wrapper(datasets, mode)
 		statvec = {control_left_stats, control_right_stats,...
 			inactivation_left_stats, inactivation_right_stats};
 
-		pairs = [1 3; 2 4];
+		pairs = [1 3; 2 4; 1 2; 3 4];
+		%pairs = [1 3; 2 4];
 		plot_stats(statvec, pairs, colors4);
 
 	otherwise
