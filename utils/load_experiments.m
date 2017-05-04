@@ -1,5 +1,12 @@
 function datasets = load_experiments(varargin)
+% LOAD_EXPERIMENTS creates a cell array of dataset objects
+% Inputs
+%	varargin - optional; indicated which experiments to load
+% Outputs
+%	datasets - a cell array of DataSet objects
 
+	
+	% Parse varargin
 	if length(varargin) > 1
 		error('Too many arguments.');
 	end
@@ -10,22 +17,24 @@ function datasets = load_experiments(varargin)
 		experiment_numbers = varargin{1};
 	end
 
-	% Constants
+	% Define constants
 	TrialType = 3;
 
+	% Initialize empty cell column vector
 	datasets = cell(length(experiment_numbers),1);
 	fprintf('Loading experiments. * indicates removal of a blink.\n');
+
+	% Loop over all experiments
 	for i=1:length(experiment_numbers)
 		exp_num = experiment_numbers(i);
 		name = sprintf('Experiment %d',exp_num);
 		fprintf('\nExperiment %d...\n', exp_num);
 
-		% General loading
+		% Load the experiment table 
 		load_struct = load(sprintf('data/QuitoImagesExp%d/Exp%d.mat',...
 		exp_num,exp_num));
 
 		if exp_num == 2 %special format
-
 			fixation_info = load_struct.FixationInfo;
 			trial_info = load_struct.TrialInfo;
 			blink_tbl = load('data/QuitoImagesExp2/Exp2EFIXtable.mat',...
@@ -37,9 +46,11 @@ function datasets = load_experiments(varargin)
 			blink_tbl = load_struct.EBLINKAll;
 		end
 
+		% Indicate where the images for this experiment live
 		im_dir = sprintf('data/QuitoImagesExp%d/All%d',...
 			exp_num, exp_num);
 
+		% Call init() to process trials and fixations
 		datasets{i} = init(trial_info,fixation_info,TrialType,...
 			blink_tbl,im_dir,name);
 	end

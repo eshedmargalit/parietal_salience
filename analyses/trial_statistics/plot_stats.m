@@ -1,8 +1,14 @@
 function plot_stats(statvec, ttest_pairs, varargin)
-% statvec is a cell array of statistic objects to plot
-% ttest_pairs is an nx2 matrix of stats in statvec to compare
+% PLOT_STATS plots statistics structs
+% Inputs
+%	statvec - cell array of statistics structures (n)
+%	ttest_pairs - indicates which statvec entries should be compared (nx2)
+%	varargin - if present, should be a matrix of colors (nx3 or nx4)
+% Outputs
+%	None
 
 
+	% Pick colors if not provided 
 	if length(varargin) == 0
 		colors = hsv(4);
 	else
@@ -15,7 +21,7 @@ function plot_stats(statvec, ttest_pairs, varargin)
 
 	for i = 1:n_fields
 		field = fields{i};
-		if strcmp(field,'label')
+		if strcmp(field,'label') % skip if it's not a statistic field
 			continue;
 		end
 
@@ -31,12 +37,24 @@ function plot_stats(statvec, ttest_pairs, varargin)
 		fprintf('\n%s\n---------------\n',field);
 		ps = do_ttests(xs, ttest_pairs, strs);
 
+		% Plot custom bar plot
 		bare(xs,ps,ttest_pairs,strs,colors);
 	end
 end
 
 
 function bare(xs,ps,ttest_pairs,strs,colors)
+% BARE custom bar plot function
+% Inputs
+%	xs - cell array of statistic structures
+%	ps - vector of p-values for comparisons
+%	ttest_pairs - nx2 matrix indicating which xs were compared to derive ps
+%	strs - what to label each bar 
+%	colors - preferred color for each bar
+% Outputs
+%	None
+
+	% Open figure
 	figure;
 	hold on;
 
@@ -49,6 +67,7 @@ function bare(xs,ps,ttest_pairs,strs,colors)
 
 		means(i) = x.mn;
 
+		% Plot bar with SEM
 		bar(i, x.mn, 0.5,'LineWidth',1.5,...
 			'FaceColor',colors(i,:));
 		errorbar(i, x.mn, x.sem, 'k.','LineWidth',1.5);
@@ -56,15 +75,19 @@ function bare(xs,ps,ttest_pairs,strs,colors)
 		ylabel(x.ylabel);
 		title(x.title);
 	end
+
+	% Set bar titles 
 	set(gca,'XTick',1:n);
 	set(gca,'XTickLabels',strs);
 
+	% Set appropriate x/y limits
 	lower_lim = min(means) * 0.95;
 	upper_lim = max(means) * 1.15;
 
 	ylim([lower_lim, upper_lim]);
 	xlim([.52, n+.52]);
 
+	% P-value plottign
 	n_pairs = size(ttest_pairs,1);
 
 	for i = 1:n_pairs
@@ -99,6 +122,14 @@ function bare(xs,ps,ttest_pairs,strs,colors)
 end
 
 function ps = do_ttests(xs, ttest_pairs, strs)
+% DO_TTESTS
+% Inputs
+%	xs - cell array of statistic structures
+%	ttest_pairs - nx2 matrix indicating which xs were compared to derive ps
+%	strs - what to label each bar 
+% Outputs
+%	ps - vector of p-values for comparisons
+
 	n_pairs = size(ttest_pairs,1);
 	if n_pairs == 0
 		ps = [];

@@ -1,5 +1,15 @@
 function trial_stats_wrapper(datasets, mode)
+% TRIAL_STATS_WRAPPER
+% Inputs
+%	datasets - a cell array of DataSet objects
+%	mode - a str indicating the trial types to use
+%		+ '' or 'all'
+%		+ 'control'
+%		+ 'inactivation'
+% Outputs
+%	None
 
+	% define colors for 2-stat and 4-stat cases
 	blue = [.161, .310, .427];
 	red = [.667, .224, .224];
 

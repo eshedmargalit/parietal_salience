@@ -25,6 +25,7 @@ function [stats, props, titles, ylabels] = trial_stats(trials, direction, label)
 	stats = struct();
 	n = length(trials);
 
+	% Prepare empty 'raw' vectors for each property in props
 	for s = 1:numel(props)
 		str = props{s};
 
@@ -32,6 +33,7 @@ function [stats, props, titles, ylabels] = trial_stats(trials, direction, label)
 		stats.(str).raw = zeros(n,1);
 	end
 
+	% populate raw vectors
 	for i = 1:n
 		trial = trials{i};
 		tstats = trial.get_stats(direction);
@@ -42,6 +44,7 @@ function [stats, props, titles, ylabels] = trial_stats(trials, direction, label)
 		end
 	end
 
+	% Compute summary statistics from raw vectors
 	for s = 1:numel(props)
 		str = props{s};
 
@@ -52,5 +55,7 @@ function [stats, props, titles, ylabels] = trial_stats(trials, direction, label)
 		stats.(str).title = titles{s};
 		stats.(str).ylabel = ylabels{s};
 	end
+
+	% Slap a label on it
 	stats.label = label;
 end

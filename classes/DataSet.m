@@ -33,7 +33,7 @@ classdef DataSet
 
 			cond = varargin{1};
 
-			if strcmp(cond,'') 
+			if strcmp(cond,'') || strcmp(cond,'all')
 				retval = self.trials;
 			else
 				retval = {};
