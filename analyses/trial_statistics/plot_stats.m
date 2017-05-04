@@ -1,4 +1,4 @@
-function plot_stats(statvec, ttest_pairs, varargin)
+function plot_stats(statvec, ttest_pairs, is_paired, varargin)
 % PLOT_STATS plots statistics structs
 % Inputs
 %	statvec - cell array of statistics structures (n)
@@ -35,7 +35,7 @@ function plot_stats(statvec, ttest_pairs, varargin)
 
 		% perform t-tests for indicated pairs
 		fprintf('\n%s\n---------------\n',field);
-		ps = do_ttests(xs, ttest_pairs, strs);
+		ps = do_ttests(xs, ttest_pairs, strs, is_paired);
 
 		% Plot custom bar plot
 		bare(xs,ps,ttest_pairs,strs,colors);
@@ -121,7 +121,7 @@ function bare(xs,ps,ttest_pairs,strs,colors)
 
 end
 
-function ps = do_ttests(xs, ttest_pairs, strs)
+function ps = do_ttests(xs, ttest_pairs, strs, is_paired)
 % DO_TTESTS
 % Inputs
 %	xs - cell array of statistic structures
@@ -147,7 +147,12 @@ function ps = do_ttests(xs, ttest_pairs, strs)
 		str2 = strs{idx2};
 
 		fprintf('t-test between %s and %s\n',str1, str2);
-		[h, ps(i), ci, stats] = ttest2(x1.raw, x2.raw);
+		if is_paired
+			[h, ps(i), ci, stats] = ttest(x1.raw, x2.raw);
+		else
+			[h, ps(i), ci, stats] = ttest2(x1.raw, x2.raw);
+		end
+
 		fprintf('t(%d) = %.2f, p = %.2f\n\n',stats.df,...
 			stats.tstat,ps(i));
 	end
