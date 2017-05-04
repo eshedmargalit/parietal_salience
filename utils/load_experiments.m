@@ -52,7 +52,7 @@ function datasets = load_experiments(varargin)
 
 		% Call init() to process trials and fixations
 		datasets{i} = init(trial_info,fixation_info,TrialType,...
-			blink_tbl,im_dir,name);
+			blink_tbl,im_dir,name,exp_num);
 	end
 	fprintf('\n');
 end

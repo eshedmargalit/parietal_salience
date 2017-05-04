@@ -1,4 +1,5 @@
-function dataset = init(trial_info, fixation_info, trial_type, blink_tbl, im_dir, name)
+function dataset = init(trial_info, fixation_info, trial_type, blink_tbl,...
+	im_dir, name, exp_num)
 %INIT filters fixation info table by experiment number and reward, return DataSet Object
 %
 % Inputs
@@ -47,7 +48,7 @@ function dataset = init(trial_info, fixation_info, trial_type, blink_tbl, im_dir
 			continue;
 		end
 		trials{row_idx} = Trial(filtered_trial_info(row_idx,:),...
-			subtable,blink_tbl,im_dir);
+			subtable,blink_tbl,im_dir,exp_num);
 	end
 
 	% remove trials for which no fixation data were available

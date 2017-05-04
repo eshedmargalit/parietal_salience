@@ -14,6 +14,7 @@ classdef Trial < handle
 		fname % the name of the 1920x1080 image
 		condition % either 'control' or 'inactivation'
 		im_dir % the folder in which images are kept
+		exp_num
 
 		%% derived props
 		% fixations
@@ -29,11 +30,12 @@ classdef Trial < handle
 	methods
 		% Constructor
 		function obj = Trial(trial_info, fixation_table, blink_tbl,...
-			im_dir)
+			im_dir, exp_num)
 
 			% trivial initialization
 			trivial_init(obj, trial_info);
 			obj.im_dir = im_dir;
+			obj.exp_num = exp_num;
 
 			% classify trial type based on maximum of two temps
 			assign_condition(obj);
@@ -99,7 +101,7 @@ classdef Trial < handle
 			end
 
 
-			if strcmp(direction,'') 
+			if strcmp(direction,'') || strcmp(direction,'all')
 				retval = obj.fixations;
 			else
 				retval = {};
