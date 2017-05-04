@@ -1,5 +1,5 @@
-function sequence = m_seq(trials, direction, n_bins);
-%M_SEQ aggregates saccades from provided trials and computes m-sequence
+function sequence = main_seq(trials, direction, n_bins);
+%MAIN_SEQ aggregates saccades from provided trials and computes m-sequence
 %
 % Inputs
 %	trials - a cell array of Trial objects to be summarized

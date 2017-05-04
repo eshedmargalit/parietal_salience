@@ -1,5 +1,5 @@
-function plot_m_seqs(seqvec, varargin)
-% PLOT_M_SEQS plots the m sequences for control and inactivation sequence structs
+function plot_main_seqs(seqvec, varargin)
+% PLOT_MAIN_SEQS plots the m sequences for control and inactivation sequence structs
 
 
 	n = numel(seqvec);
