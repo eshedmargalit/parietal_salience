@@ -19,6 +19,7 @@ classdef Trial < handle
 		% fixations
 		fixations
 		n_fixations
+		baseline_fixation % time after fixation onset and before image onset
 
 		% saccades
 		saccades
@@ -314,6 +315,7 @@ classdef Trial < handle
 				fixations{i} = Fixation(fix_tbl(i,:),x0,y0);
 			end
 			obj.fixations = fixations';
+			obj.baseline_fixation = fix0;
 		end
 
 		function saccades = compute_saccades(obj)

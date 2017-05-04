@@ -95,7 +95,7 @@ function trial_stats_wrapper(datasets, mode)
 				control_right_stats,...
 				inactivation_left_stats,...
 				inactivation_right_stats};
-				pairs = [1 3; 2 4];
+				pairs = [1 3; 2 4; 1 2; 3 4];
 				plot_stats(statvec, pairs, 1, colors4);
 			else
 				continue;
@@ -146,7 +146,6 @@ function trial_stats_wrapper(datasets, mode)
 				pairs = [1 2];
 				plot_stats(statvec, pairs, 0, colors2);
 			end
-
 		end
 	end
 end

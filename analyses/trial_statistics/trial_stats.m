@@ -13,9 +13,10 @@ function [stats, props, titles, ylabels] = trial_stats(trials, direction, label)
 % April 25, 2017
 
 	% create list of all fields to compute statistics on
-	props = {'fixation_durations_mn','pupil_sizes_mn','n_fixations'};
-	titles = {'Fixation Duration (ms)', 'Pupil Size', 'Number of Fixations'};
-	ylabels = titles;
+	[props, titles, ylabels] = parse_desired_stats();
+	%props = {'fixation_durations_mn','pupil_sizes_mn','n_fixations'};
+	%titles = {'Fixation Duration (ms)', 'Pupil Size', 'Number of Fixations'};
+	%ylabels = titles;
 
 	if isempty(trials) % intended use case: user just wants props
 		stats = [];
