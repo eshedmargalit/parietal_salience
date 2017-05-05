@@ -1,4 +1,4 @@
-function aucs = compare_auc(trials)
+function aucs = compare_auc(trials, dims, n_thresholds)
 % COMPARE_AUC compares area under ROC curve for the trials provided
 
 	%dims = [36, 64];
@@ -29,13 +29,13 @@ function aucs = compare_auc(trials)
 			base_rn, t.exp_num, t.figure_number);
 
 		[gbvs_roc, gbvs_auc] = saliency_roc(gbvs_str,...
-			t.get_fixations('all'), dims);
+			t.get_fixations('all'), dims, n_thresholds);
 
 		[sam_vgg_roc, sam_vgg_auc] = saliency_roc(sam_vgg_str,...
-			t.get_fixations('all'), dims);
+			t.get_fixations('all'), dims, n_thresholds);
 
 		[sam_rn_roc, sam_rn_auc] = saliency_roc(sam_rn_str,...
-			t.get_fixations('all'), dims);
+			t.get_fixations('all'), dims, n_thresholds);
 
 		aucs(i,1) = gbvs_auc;
 		aucs(i,2) = sam_vgg_auc;

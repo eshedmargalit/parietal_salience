@@ -1,4 +1,4 @@
-function [curve, auc] = saliency_roc(sm_fname, fixations, scaled_dims)
+function [curve, auc] = saliency_roc(sm_fname, fixations, scaled_dims, n_thresh)
 % SALIENCY_ROC computes area under curve for saliency map predictions
 % Inputs
 %	sm_fname - str containing the location of a precomputed saliency map
@@ -27,7 +27,6 @@ function [curve, auc] = saliency_roc(sm_fname, fixations, scaled_dims)
 	no_fix = (fix_counts == 0);
 
 	%% Pick reasonable thresholds, given the saliency maps
-	n_thresh = 50;
 	thresholds = generate_thresholds(sm_resized, n_thresh);
 
 	%% Construct ROC curve
