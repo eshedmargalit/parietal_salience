@@ -65,10 +65,12 @@ classdef Trial < handle
 
 			durations = zeros(stats.n_fixations,1);
 			pupil_sizes = zeros(stats.n_fixations,1);
+			saliences = zeros(stats.n_fixations,1);
 
 			for i = 1:stats.n_fixations
 				durations(i) = fixations{i}.duration;
 				pupil_sizes(i) = fixations{i}.pupil;
+				saliences(i) = fixations{i}.salience;
 			end
 
 			% Fixation durations
@@ -85,9 +87,17 @@ classdef Trial < handle
 			stats.pupil_sizes.sem = stats.pupil_sizes.sd...
 				./ sqrt(stats.n_fixations);
 
+			% Saliences
+			stats.saliences = struct();
+			stats.saliences.mn = mean(saliences);
+			stats.saliences.sd = std(saliences);
+			stats.saliences.sem = stats.saliences.sd...
+				./ sqrt(stats.n_fixations);
+
 			% For ease of access, store means separately
 			stats.fixation_durations_mn = stats.fixation_durations.mn;
 			stats.pupil_sizes_mn = stats.pupil_sizes.mn;
+			stats.saliences_mn = stats.saliences.mn;
 
 		end
 
@@ -313,8 +323,14 @@ classdef Trial < handle
 
 			% Initialize all fixations
 			fixations = {};
+
+			base = '~/moorelab/parietal_inactivation/data/QuitoImagesExp';
+			gbvs_str = sprintf('%s%d/saliency_maps/gbvs_A%d.jpg',...
+				base, obj.exp_num, obj.figure_number);
+			salmap = imread(gbvs_str);
 			for i = 1:n_fixations
-				fixations{i} = Fixation(fix_tbl(i,:),x0,y0);
+				fixations{i} = Fixation(fix_tbl(i,:),...
+					x0,y0,salmap');
 			end
 			obj.fixations = fixations';
 			obj.baseline_fixation = fix0;
