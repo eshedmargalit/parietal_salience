@@ -9,8 +9,7 @@ function summaries = aggregate_stat_summaries(datasets, mode, direction, label)
 %	summaries - a struct with fields raw, mn, md, sd, sem, title, and ylabel
 	% from trial_stats, get the properties that matter
 
-	% Make a dummy call to trial_stats to get relevant properties
-	[~, props, titles, ylabels] = trial_stats([]);
+	[props, titles, ylabels] = parse_desired_stats();
 
 	n = length(datasets);
 	summaries = struct();
