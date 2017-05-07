@@ -59,5 +59,6 @@ function dataset = init(trial_info, fixation_info, trial_type, blink_tbl,...
 		trials(nofix) = [];
 	end
 
-	dataset = DataSet(trials,trial_info,fixation_info,blink_tbl,name);
+	dataset = DataSet(trials,trial_info,fixation_info,blink_tbl,name,...
+		exp_num);
 end

@@ -165,8 +165,8 @@ classdef Trial < handle
 
 			[xs, ys] = get_fixation_positions(...
 				self.get_fixations(direction));
-			xs = floor(xs);
-			ys = floor(ys);
+			xs = max(1,floor(xs));
+			ys = max(1,floor(ys));
 
 			fm = zeros(1920,1080);
 
@@ -194,7 +194,7 @@ classdef Trial < handle
 			rangey = linspace(0,ypix,scaled_dims(1));
 			rangex = linspace(0,xpix,scaled_dims(2));
 			downsampled = hist3([ys,xs],{rangey,rangex});
-			dm = imresize(downsampled,[xpix,ypix]);
+			dm = imresize(downsampled',[xpix,ypix],'lanczos3');
 		end
 
 		% plots image and saliency map
