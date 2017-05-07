@@ -333,7 +333,12 @@ classdef Trial < handle
 					x0,y0,salmap');
 			end
 			obj.fixations = fixations';
-			obj.baseline_fixation = fix0;
+
+			if size(fix0,1) == 0
+				obj.baseline_fixation = fix_tbl(1,:);
+			else
+				obj.baseline_fixation = fix0;
+			end
 		end
 
 		function saccades = compute_saccades(obj)
