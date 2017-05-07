@@ -151,6 +151,52 @@ classdef Trial < handle
 			end
 		end
 
+		% get fixation map
+		function fm = get_fixation_map(self, varargin)
+
+			xpix = 1920;
+			ypix = 1080;
+
+			if length(varargin) > 0
+				direction = varargin{1};
+			else
+				direction = 'all';
+			end
+
+			[xs, ys] = get_fixation_positions(...
+				self.get_fixations(direction));
+			xs = floor(xs);
+			ys = floor(ys);
+
+			fm = zeros(1920,1080);
+
+			for i = 1:length(xs)
+				fm(xs(i),ys(i)) = 1;
+			end
+
+		end
+
+		% get density map
+		function dm = get_density_map(self, scaled_dims, varargin)
+
+			xpix = 1920;
+			ypix = 1080;
+
+			if length(varargin) > 0
+				direction = varargin{1};
+			else
+				direction = 'all';
+			end
+
+			[xs, ys] = get_fixation_positions(...
+				self.get_fixations(direction));
+
+			rangey = linspace(0,ypix,scaled_dims(1));
+			rangex = linspace(0,xpix,scaled_dims(2));
+			downsampled = hist3([ys,xs],{rangey,rangex});
+			dm = imresize(downsampled,[xpix,ypix]);
+		end
+
 		% plots image and saliency map
 		function hm = get_heatmap(self)
 			img = imread(self.fname);

@@ -55,20 +55,6 @@ function [curve, auc] = saliency_roc(sm_fname, fixations, scaled_dims, n_thresh)
 	auc = trapz(curve(:,1),curve(:,2));
 end
 
-function [xs, ys] = get_fixation_positions(fixations)
-
-	n_fix = numel(fixations);
-	xs = zeros(n_fix,1);
-	ys = zeros(n_fix,1);
-
-	for i = 1:n_fix
-		fix = fixations{i};
-		xs(i) = fix.x;
-		ys(i) = fix.y;
-	end
-
-end
-
 function thresholds = generate_thresholds(sm_resized, n_thresh)
 
 	thresholds = [];
