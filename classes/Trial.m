@@ -194,7 +194,7 @@ classdef Trial < handle
 			rangey = linspace(0,ypix,scaled_dims(1));
 			rangex = linspace(0,xpix,scaled_dims(2));
 			downsampled = hist3([ys,xs],{rangey,rangex});
-			dm = imresize(downsampled',[xpix,ypix],'lanczos3');
+			dm = imresize(downsampled',[xpix,ypix],'lanczos2');
 		end
 
 		% plots image and saliency map

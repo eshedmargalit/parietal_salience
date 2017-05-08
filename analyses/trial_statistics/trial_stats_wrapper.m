@@ -102,6 +102,45 @@ function trial_stats_wrapper(datasets, mode)
 			end
 		end
 		
+	case 'pair_aggregate'
+		n_d = length(datasets);
+
+		all_pairs=[];
+		for i = 1:n_d
+
+			ds = datasets{i};
+			control_trials = ds.get_trials('control');
+			inactivation_trials = ds.get_trials('inactivation');
+
+
+			if (size(inactivation_trials,1) > 0)
+				pairs = get_trial_pairs(control_trials,...
+					inactivation_trials);
+				all_pairs = [all_pairs; pairs];
+			end
+		end
+		control_trials = all_pairs(:,1);
+		inactivation_trials = all_pairs(:,2);
+
+		control_left_stats = trial_stats(...
+			control_trials,'left',...
+			'control-left');
+		control_right_stats = trial_stats(...
+			control_trials,'right',...
+			'control-right');
+		inactivation_left_stats = trial_stats(...
+			inactivation_trials,'left',...
+			'inactivation-left');
+		inactivation_right_stats = trial_stats(...
+			inactivation_trials,'right',...
+			'inactivation-right');
+
+		statvec = {control_left_stats,...
+		control_right_stats,...
+		inactivation_left_stats,...
+		inactivation_right_stats};
+		pairs = [1 3; 2 4; 1 2; 3 4];
+		plot_stats(statvec, pairs, 1, colors4);
 	otherwise
 		% standard case, plot separately for each dataset,
 		% error is taken over Trials within that dataset
