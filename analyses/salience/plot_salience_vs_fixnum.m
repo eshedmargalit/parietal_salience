@@ -89,5 +89,8 @@ function plot_scores(scores, colors)
 		shadedErrorBar(1:n_x, mn, sem,...
 			{'color',colors(i,:)});
 	end
+	title('Salience vs. Fixation Number');
+	ylabel('Salience');
+	xlabel('Fixation Number');
 
 end
