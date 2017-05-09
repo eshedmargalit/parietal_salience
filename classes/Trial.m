@@ -75,7 +75,7 @@ classdef Trial < handle
 
 			% Fixation durations
 			stats.fixation_durations = struct();
-			stats.fixation_durations.mn = mean(durations); 
+			stats.fixation_durations.mn = mean(durations);
 			stats.fixation_durations.sd = std(durations);
 			stats.fixation_durations.sem = stats.fixation_durations.sd...
 				./ sqrt(stats.n_fixations);
@@ -353,8 +353,6 @@ classdef Trial < handle
 			baseline_fixation_indices = find(intersection);
 			fix0 = fix_tbl(baseline_fixation_indices,:);
 
-			x0s = fix0.XPosition;
-			y0s = fix0.YPosition;
 
 			% if any fixations meet the criteria after blink
 			% removal, use the mean. If not, use the
@@ -363,22 +361,37 @@ classdef Trial < handle
 				x0 = fix_tbl.XPosition(1);
 				y0 = fix_tbl.YPosition(1);
 			else
-				x0 = mean(x0s);
-				y0 = mean(y0s);
+				x0 = mean(fix0.XPosition);
+				y0 = mean(fix0.YPosition);
 			end
 
-			% Initialize all fixations
-			fixations = {};
 
+			% Load salience map
 			base = '~/moorelab/parietal_inactivation/data/QuitoImagesExp';
 			gbvs_str = sprintf('%s%d/saliency_maps/gbvs_A%d.jpg',...
 				base, obj.exp_num, obj.figure_number);
 			salmap = imread(gbvs_str);
+
+			% Keep any fixations after image onset
+			start_after_image_onset = fix_tbl.FixationStart >= obj.image_on;
+
+			% if all fixations are before image onset (?) then grab first fixation
+			if all(~start_after_image_onset)
+				fix_tbl = fix_tbl(1:2,:);
+			else
+				fix_tbl(~start_after_image_onset, :) = [];
+			end
+
+			n_fixations = size(fix_tbl,1);
+
+			% Initialize all fixations
+			fixations = cell(n_fixations,1);
+
 			for i = 1:n_fixations
 				fixations{i} = Fixation(fix_tbl(i,:),...
 					x0,y0,salmap');
 			end
-			obj.fixations = fixations';
+			obj.fixations = fixations;
 
 			if size(fix0,1) == 0
 				obj.baseline_fixation = fix_tbl(1,:);

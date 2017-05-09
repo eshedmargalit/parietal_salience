@@ -46,9 +46,9 @@ function [stats, props, titles, ylabels] = trial_stats(trials, direction, label)
 	for s = 1:numel(props)
 		str = props{s};
 
-		stats.(str).mn = mean(stats.(str).raw);
+		stats.(str).mn = nanmean(stats.(str).raw);
 		stats.(str).md = median(stats.(str).raw);
-		stats.(str).sd = std(stats.(str).raw);
+		stats.(str).sd = nanstd(stats.(str).raw);
 		stats.(str).sem = stats.(str).sd ./ sqrt(n);
 		stats.(str).title = titles{s};
 		stats.(str).ylabel = ylabels{s};
