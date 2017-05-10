@@ -17,7 +17,9 @@ function main_seq_wrapper(datasets, mode, varargin)
 		n_bins = 15;
 	end
 
-	if strcmp(mode, 'aggregate')
+	%if strcmp(mode, 'aggregate')
+	switch mode
+	case 'aggregate'
 		control_trials = aggregate_trials(datasets,'control');
 		inactivation_trials = aggregate_trials(datasets,'inactivation');
 
@@ -37,7 +39,44 @@ function main_seq_wrapper(datasets, mode, varargin)
 			inactivation_seq_right};
 
 		plot_main_seqs(seqvec, colors4, markers4, strs4);
-	else
+	case 'pair_aggregate'
+		n_d = length(datasets);
+
+		all_pairs=[];
+		for i = 1:n_d
+
+			ds = datasets{i};
+			control_trials = ds.get_trials('control');
+			inactivation_trials = ds.get_trials('inactivation');
+
+
+			if (size(inactivation_trials,1) > 0)
+				pairs = get_trial_pairs(control_trials,...
+					inactivation_trials);
+				all_pairs = [all_pairs; pairs];
+			end
+		end
+		control_trials = all_pairs(:,1);
+		inactivation_trials = all_pairs(:,2);
+
+		control_seq_left = main_seq(control_trials, ...
+			'left', n_bins); 
+		inactivation_seq_left = main_seq(inactivation_trials, ...
+			'left', n_bins); 
+
+		control_seq_right = main_seq(control_trials, ...
+			'right', n_bins); 
+		inactivation_seq_right = main_seq(inactivation_trials, ...
+			'right', n_bins); 
+
+		seqvec = {control_seq_left,...
+			control_seq_right,...
+			inactivation_seq_left,...
+			inactivation_seq_right};
+
+		plot_main_seqs(seqvec, colors4, markers4, strs4);
+
+	otherwise
 		n_d = length(datasets);
 
 		for i = 1:n_d
