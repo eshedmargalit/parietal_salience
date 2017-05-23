@@ -141,6 +141,50 @@ function trial_stats_wrapper(datasets, mode)
 		inactivation_right_stats};
 		pairs = [1 3; 2 4; 1 2; 3 4];
 		plot_stats(statvec, pairs, 1, colors4);
+	case 'pair_scatter'
+		n_d = length(datasets);
+		% produce n x 2 matrix, each row a dataset, each column a condition
+
+		statmat = cell(n_d,4);
+		skips = []; %track datasets to ignore
+
+		for i = 1:n_d
+			ds = datasets{i};
+
+			control_trials = ds.get_trials('control');
+			inactivation_trials = ds.get_trials('inactivation');
+
+			% skip datasets without inactivation
+			if (size(inactivation_trials,1) == 0)
+				skips = [skips i];
+				continue;
+			end
+
+			% get statistics for left/right fixations
+			control_left_stats = trial_stats(...
+				control_trials,'left',...
+				'control-left');
+			control_right_stats = trial_stats(...
+				control_trials,'right',...
+				'control-right');
+			inactivation_left_stats = trial_stats(...
+				inactivation_trials,'left',...
+				'inactivation-left');
+			inactivation_right_stats = trial_stats(...
+				inactivation_trials,'right',...
+				'inactivation-right');
+
+			% add to statmat
+			statmat{i,1} = control_left_stats;
+			statmat{i,2} = control_right_stats;
+			statmat{i,3} = inactivation_left_stats;
+			statmat{i,4} = inactivation_right_stats;
+		end
+
+		statmat(skips,:) = [];
+		plot_scatter(statmat);
+
+
 	otherwise
 		% standard case, plot separately for each dataset,
 		% error is taken over Trials within that dataset
