@@ -102,36 +102,43 @@ classdef Trial < handle
 
 		end
 
-		function retval = get_fixations(obj, varargin)
-			if length(varargin) > 2
-				error('Too many arguments. 1 argument expected');
-			elseif length(varargin) == 0
-				direction = '';
-			else
-				direction = varargin{1};
-				order = varargin{2};
-			end
+		function retval = get_fixations(obj, direction, order)
 
 			switch order
 			case 'prev'
-				field_string = 'prev_saccade';
+				saccade_order = 'prev_saccade';
 			case 'next'
-				field_string = 'next_saccade';
+				saccade_order = 'next_saccade';
 			otherwise
 				error('Please choose one of ''next'' or ''prev''');
 			end
 
 			if strcmp(direction,'') || strcmp(direction,'all')
 				retval = obj.fixations;
+			elseif startsWith(direction,'global')
+				retval = {};
+				for i = 1:obj.n_fixations
+					f = obj.fixations{i};
+					if isempty(f.(saccade_order))
+						continue;
+					end
+
+					pos = split(direction,'_');
+					pos = pos{2};
+					if strcmp(pos, f.(saccade_order).global_position)
+						retval = [retval; {f}];
+					end
+				end
+
 			else
 				retval = {};
 				for i = 1:obj.n_fixations
 					f = obj.fixations{i};
-					if isempty(f.(field_string))
+					if isempty(f.(saccade_order))
 						continue;
 					end
 
-					if strcmp(direction, f.(field_string).direction)
+					if strcmp(direction, f.(saccade_order).direction)
 						retval = [retval; {f}];
 					end
 				end

@@ -5,8 +5,9 @@ classdef Saccade < handle
 		direction
 		xs
 		ys
-		prev_fixation;
-		next_fixation;
+		prev_fixation
+		next_fixation
+		global_position
 	end
 
 	methods
@@ -38,6 +39,13 @@ classdef Saccade < handle
 				obj.direction = 'right';
 			else
 				obj.direction = 'left';
+			end
+
+			% position
+			if x2 < (1920/2)
+				obj.global_position = 'left';
+			else
+				obj.global_position = 'right';
 			end
 		end
 	end
