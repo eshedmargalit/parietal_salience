@@ -81,7 +81,7 @@ function [xs, ys, colors] = gather_points(statmat, field)
 	colors = zeros(n*2,3);
 
 	start_cols = [1 3];
-	colormat = [.8 .1 .1; .1 .1 .8];
+	colormat = [157 68 181; 10 255 237]./255;
 	for i = 1:2
 		for j = 1:n
 			idx = (i-1) * n + j;

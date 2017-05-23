@@ -1,9 +1,10 @@
-function summaries = aggregate_stat_summaries(datasets, mode, direction, label)
+function summaries = aggregate_stat_summaries(datasets, mode, direction, order, label)
 % AGGREGATE_STAT_SUMMARIES create pseudo-statistics structs from datasets
 % Inputs
 %	datasets - a cell array of datasets to aggregate over
 %	mode - the kind of trials to use (e.g., 'all', 'control', 'inactivation')
 %	direction - which fixations to use (e.g.,  'left', 'right')
+%	order - which saccade to use as reference (e.g., 'next' or 'prev')
 %	label - a str describing the combination of the above settings, e.g., 'control-left'
 % Outputs
 %	summaries - a struct with fields raw, mn, md, sd, sem, title, and ylabel
@@ -35,11 +36,11 @@ function summaries = aggregate_stat_summaries(datasets, mode, direction, label)
 			tmp = zeros(length(trials),1);
 			for t = 1:length(trials)
 				trial = trials{t};
-				tstats = trial.get_stats(direction);
+				tstats = trial.get_stats(direction, order);
 				tmp(t) = tstats.(str);
 			end
 
-			summaries.(str).raw(d) = mean(tmp);
+			summaries.(str).raw(d) = nanmean(tmp);
 		end
 
 		% remove any datasets for which there were no data

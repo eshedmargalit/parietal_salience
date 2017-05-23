@@ -55,10 +55,11 @@ classdef Trial < handle
 			assign_fixations_saccades(obj);
 		end
 
-		function stats = get_stats(self, direction)
+		function stats = get_stats(self, direction, order)
 			% direction can be '', 'left', or 'right'
+			% order can be 'next' or 'prev'
 
-			fixations = self.get_fixations(direction);
+			fixations = self.get_fixations(direction, order);
 
 			stats = struct();
 			stats.n_fixations = length(fixations);
@@ -102,14 +103,23 @@ classdef Trial < handle
 		end
 
 		function retval = get_fixations(obj, varargin)
-			if length(varargin) > 1
+			if length(varargin) > 2
 				error('Too many arguments. 1 argument expected');
 			elseif length(varargin) == 0
 				direction = '';
 			else
 				direction = varargin{1};
+				order = varargin{2};
 			end
 
+			switch order
+			case 'prev'
+				field_string = 'prev_saccade';
+			case 'next'
+				field_string = 'next_saccade';
+			otherwise
+				error('Please choose one of ''next'' or ''prev''');
+			end
 
 			if strcmp(direction,'') || strcmp(direction,'all')
 				retval = obj.fixations;
@@ -117,11 +127,11 @@ classdef Trial < handle
 				retval = {};
 				for i = 1:obj.n_fixations
 					f = obj.fixations{i};
-					if isempty(f.prev_saccade)
+					if isempty(f.(field_string))
 						continue;
 					end
 
-					if strcmp(direction, f.prev_saccade.direction)
+					if strcmp(direction, f.(field_string).direction)
 						retval = [retval; {f}];
 					end
 				end
