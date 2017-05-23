@@ -311,22 +311,29 @@ classdef Trial < handle
 		end
 
 		function assign_fixations_saccades(obj)
+			cum_dist = 0;
 			for fix_idx = 1:obj.n_fixations
-				if fix_idx == 1
+
+				if fix_idx == 1 % first
 					obj.fixations{fix_idx}.next_saccade = ...
 						obj.saccades{fix_idx};
 					obj.fixations{fix_idx}.prev_saccade = ...
 						[];
-				elseif fix_idx == obj.n_fixations
+					obj.fixations{fix_idx}.cumulative_distance = 0;
+					cum_dist = cum_dist + obj.fixations{fix_idx}.next_saccade.distance;
+				elseif fix_idx == obj.n_fixations % last
 					obj.fixations{fix_idx}.next_saccade = ...
 						[];
 					obj.fixations{fix_idx}.prev_saccade = ...
 						obj.saccades{fix_idx-1};	
-				else
+					obj.fixations{fix_idx}.cumulative_distance = cum_dist;
+				else %middle
 					obj.fixations{fix_idx}.next_saccade = ...
 						obj.saccades{fix_idx};
 					obj.fixations{fix_idx}.prev_saccade = ...
 						obj.saccades{fix_idx-1};	
+					obj.fixations{fix_idx}.cumulative_distance = cum_dist;
+					cum_dist = cum_dist + obj.fixations{fix_idx}.next_saccade.distance;
 				end
 			end
 		end

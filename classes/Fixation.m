@@ -18,6 +18,7 @@ classdef Fixation < handle
 		% saccadic
 		next_saccade;
 		prev_saccade;
+		cumulative_distance;
 	end
 
 	methods

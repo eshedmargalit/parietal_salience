@@ -26,10 +26,10 @@ function plot_salience_vs_fixnum(trialsvec, n_fix, direction, varargin)
 		trials = trialsvec{i};
 		%n_fix = check_n_fix(trials, n_fix, direction);
 
-		scores{i} = agg_fixation_scores(trials, n_fix, direction);
+		[scores{i}, distances{i}] = agg_fixation_scores(trials, n_fix, direction);
 	end
 
-	plot_scores(scores, colors);
+	plot_scores(distances, scores, colors);
 
 end
 
@@ -53,44 +53,51 @@ function nf = check_n_fix(trials, nf, direction)
 	end
 end
 
-function scores = agg_fixation_scores(trials, n_fix, direction)
+function [scores, distances] = agg_fixation_scores(trials, n_fix, direction)
 	scores = zeros(length(trials),n_fix);
+	distances = zeros(length(trials),n_fix);
 	for i = 1:length(trials)
-		fixations = trials{i}.get_fixations(direction);
+		fixations = trials{i}.get_fixations(direction,'prev');
 		num_available = length(fixations);
 
 		for j = 1:n_fix
 
 			if j <= num_available
 				scores(i,j) = fixations{j}.salience;
+				distances(i,j) = fixations{j}.cumulative_distance;
 			else
 				scores(i,j) = NaN;
+				distances(i,j) = NaN; 
 			end
 		end
 
 	end
 end
 
-function plot_scores(scores, colors)
+function plot_scores(distances, scores, colors)
 
 	n = numel(scores);
 	figure; hold on;
 
 	for i=1:n
-		x = scores{i};
-		n_x = size(x,2);
-		mn = nanmean(x,1);
-		sd = nanstd(x, [], 1);
+		y = scores{i};
+		n_y = size(y,2);
+		mn = nanmean(y,1);
+		sd = nanstd(y, [], 1);
 
-		n_nan = sum(isnan(x));
-		n_valid = size(x,1) - n_nan;
+		n_nan = sum(isnan(y));
+		n_valid = size(y,1) - n_nan;
 		sem = sd ./ sqrt(n_valid);
 
-		shadedErrorBar(1:n_x, mn, sem,...
+		% average distances
+		x = distances{i};
+		mnx = nanmean(x,1);
+
+		shadedErrorBar(mnx, mn, sem,...
 			{'color',colors(i,:)});
 	end
-	title('Salience vs. Fixation Number');
+	title('Salience vs. Cumulative Saccade Distance');
 	ylabel('Salience');
-	xlabel('Fixation Number');
+	xlabel('Cumulative Saccade Distance (px)');
 
 end
