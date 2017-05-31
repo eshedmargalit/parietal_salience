@@ -47,9 +47,9 @@ function scat(xs,ys,colors)
 	end
 
 	% make plot
-	errorbar(xmns,ymns,ysems,'.k');
-	errorbar(xmns,ymns,xsems,'horizontal','.k');
-	scatter(xmns,ymns,200,colors,'filled');
+	errorbar(xmns,ymns,ysems,'.k','CapSize',0);
+	errorbar(xmns,ymns,xsems,'horizontal','.k','CapSize',0);
+	scatter(xmns,ymns,150,colors,'filled','MarkerEdgeColor','k');
 	title(xs{1}.title);
 	xlabel(sprintf('%s CONTROL',xs{1}.ylabel));
 	ylabel(sprintf('%s INACTIVATION',xs{1}.ylabel));
@@ -63,9 +63,10 @@ function scat(xs,ys,colors)
 
 	% legend
 	h = zeros(2,1);
-	h(1) = plot(NaN,NaN,'o','MarkerEdgeColor',colors(1,:),...
+	%h(1) = plot(NaN,NaN,'o','MarkerEdgeColor',colors(1,:),...
+	h(1) = plot(NaN,NaN,'o','MarkerEdgeColor','k',...
 		'MarkerFaceColor',colors(1,:));
-	h(2) = plot(NaN,NaN,'o','MarkerEdgeColor',colors(end,:),...
+	h(2) = plot(NaN,NaN,'o','MarkerEdgeColor','k',...
 		'MarkerFaceColor',colors(end,:));
 	legend(h,'After Left Saccade','After Right Saccade');
 
@@ -81,7 +82,7 @@ function [xs, ys, colors] = gather_points(statmat, field)
 	colors = zeros(n*2,3);
 
 	start_cols = [1 3];
-	colormat = [157 68 181; 10 255 237]./255;
+	colormat = [174 207 223; 147 116 138]./255;
 	for i = 1:2
 		for j = 1:n
 			idx = (i-1) * n + j;
