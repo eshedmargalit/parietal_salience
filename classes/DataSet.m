@@ -10,6 +10,8 @@ classdef DataSet
 
 		exp_num
 		name 
+
+		chance_salience
 	end
 
 	methods
@@ -24,6 +26,9 @@ classdef DataSet
 			obj.blink_tbl = blink_tbl;
 			obj.name = name;
 			obj.exp_num = exp_num;
+
+			% compute chance salience
+			obj.chance_salience = get_chance_salience(trials);
 		end
 
 		% get some subset of trials
