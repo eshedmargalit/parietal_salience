@@ -186,7 +186,7 @@ function trial_stats_wrapper(datasets, mode, order)
 		end
 
 		statmat(skips,:) = [];
-		plot_scatter(statmat);
+		plot_scatter(statmat, order);
 
 
 	otherwise

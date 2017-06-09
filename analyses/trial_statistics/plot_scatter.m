@@ -1,4 +1,4 @@
-function plot_scatter(statmat)
+function plot_scatter(statmat, order)
 % PLOT_STATS plots statistics structs
 % Inputs
 %	statmat - cell array of statistics structures (n)
@@ -22,12 +22,12 @@ function plot_scatter(statmat)
 
 		% Plot custom scatter plot
 		% cleft, cright, ileft, iright
-		scat(xs,ys,colors);
+		scat(xs,ys,colors,order);
 	end
 end
 
 
-function scat(xs,ys,colors)
+function scat(xs,ys,colors,order)
 % each x, y is a struct
 	n = length(xs);
 	assert(n == length(ys));
@@ -68,7 +68,13 @@ function scat(xs,ys,colors)
 		'MarkerFaceColor',colors(1,:));
 	h(2) = plot(NaN,NaN,'o','MarkerEdgeColor','k',...
 		'MarkerFaceColor',colors(end,:));
-	legend(h,'After Left Saccade','After Right Saccade');
+
+	switch order
+	case 'prev'
+		legend(h,'After Left Saccade','After Right Saccade');
+	case 'next'
+		legend(h,'Before Left Saccade','Before Right Saccade');
+	end
 
 		
 	
