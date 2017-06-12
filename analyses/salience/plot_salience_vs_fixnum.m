@@ -12,6 +12,7 @@ function plot_salience_vs_fixnum(trialsvec, n_fix, direction, varargin)
 % Eshed Margalit
 % May 8, 2017
 
+	%% Pre-processing
 	n = numel(trialsvec);
 
 	if length(varargin) == 0
@@ -30,6 +31,7 @@ function plot_salience_vs_fixnum(trialsvec, n_fix, direction, varargin)
 			agg_fixation_scores(trials, n_fix, direction);
 	end
 
+	%% Plotting raw traces
 	%x_axis = distances;
 	%xaxstr = 'Cumulative Saccade Distance (px)';
 
@@ -37,6 +39,9 @@ function plot_salience_vs_fixnum(trialsvec, n_fix, direction, varargin)
 	xaxstr = 'Saccade Index';
 
 	plot_scores(x_axis, xaxstr, scores, colors);
+
+	%% Permutation testing and plotting
+	permutation_testing(x_axis, xaxstr, scores);
 
 end
 
@@ -110,4 +115,65 @@ function plot_scores(x_axis, xaxstr, scores, colors)
 	ylabel('Salience (% Chance)');
 	xlabel(xaxstr);
 
+end
+
+function permutation_testing(x_axis, xaxstr, scores)
+
+	figure();
+	control_scores = scores{1};
+	inactivation_scores = scores{2};
+
+	% Compute and plot shuffled difference
+	%%%%%%%%%%%%%
+	all_scores = [control_scores; inactivation_scores];
+	n = size(all_scores,1);
+	n_half = n/2;
+
+	fake_indices = randperm(n);
+	new_control_indices = fake_indices(1:n_half);
+	new_inactivation_indices = fake_indices((n_half+1):end);
+
+	new_control_scores = all_scores(new_control_indices,:);
+	new_inactivation_scores = all_scores(new_inactivation_indices,:);
+
+	new_diff = new_control_scores - new_inactivation_scores;
+
+	n = size(new_diff, 2);
+	mn = nanmean(new_diff, 1);
+	sd = nanstd(new_diff, [], 1);
+
+	n_nan = sum(isnan(new_diff));
+	n_valid = size(new_diff,1) - n_nan;
+	sem = sd ./ sqrt(n_valid);
+
+	x = x_axis{1};
+	mnx = nanmean(x,1);
+
+	shadedErrorBar(mnx, mn, sem,...
+		{'color','k'});
+	hold on;
+
+
+	% Compute and plot true difference
+	%%%%%%%%%%%%%%%%%
+
+	diff = control_scores - inactivation_scores;
+
+	n = size(diff, 2);
+	mn = nanmean(diff, 1);
+	sd = nanstd(diff, [], 1);
+
+	n_nan = sum(isnan(diff));
+	n_valid = size(diff,1) - n_nan;
+	sem = sd ./ sqrt(n_valid);
+
+	x = x_axis{1};
+	mnx = nanmean(x,1);
+
+	shadedErrorBar(mnx, mn, sem,...
+		{'color','r'});
+
+	title(sprintf('Difference in Salience vs. %s',xaxstr));
+	ylabel('Difference in % Chance Salience (Control - Inactivation)');
+	xlabel(xaxstr);
 end
