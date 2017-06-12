@@ -21,14 +21,17 @@ classdef Trial < handle
 		fixations
 		n_fixations
 		baseline_fixation % time after fixation onset and before image onset
+		chance_salience
 
 		% saccades
 		saccades
 		n_saccades
+
 	end
 
 	methods
-		% Constructor
+		%% Constructor
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function obj = Trial(trial_info, fixation_table, blink_tbl,...
 			im_dir, exp_num)
 
@@ -55,6 +58,8 @@ classdef Trial < handle
 			assign_fixations_saccades(obj);
 		end
 
+		%% For relevant fields, compute basic statistics 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function stats = get_stats(self, direction, order)
 			% direction can be '', 'left', or 'right'
 			% order can be 'next' or 'prev'
@@ -71,7 +76,7 @@ classdef Trial < handle
 			for i = 1:stats.n_fixations
 				durations(i) = fixations{i}.duration;
 				pupil_sizes(i) = fixations{i}.pupil;
-				saliences(i) = fixations{i}.salience;
+				saliences(i) = fixations{i}.percent_chance_salience;
 			end
 
 			% Fixation durations
@@ -102,6 +107,12 @@ classdef Trial < handle
 
 		end
 
+		%% Retrieve fixations matching the direction provided. Filter
+		%% by direction, which can be 'left', 'right', 'global_left'
+		%% or 'global_right'. The 'order' argument specifies whether 
+		%% fixations should be labeled by the direction of the preceding
+		%% saccade ('prev') or the next saccade ('next')
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function retval = get_fixations(obj, direction, order)
 
 			switch order
@@ -145,6 +156,8 @@ classdef Trial < handle
 			end
 		end
 
+		%% Retrieve saccades matching the direction ('left' or 'right')
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function retval = get_saccades(obj, varargin)
 			if length(varargin) > 1
 				error('Too many arguments. 1 argument expected');
@@ -168,7 +181,8 @@ classdef Trial < handle
 			end
 		end
 
-		% get fixation map
+		%% Creates a binary fixation map 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function fm = get_fixation_map(self, varargin)
 
 			xpix = 1920;
@@ -193,7 +207,8 @@ classdef Trial < handle
 
 		end
 
-		% get density map
+		%% Get the fixation density map 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function dm = get_density_map(self, scaled_dims, varargin)
 
 			xpix = 1920;
@@ -214,7 +229,8 @@ classdef Trial < handle
 			dm = imresize(downsampled',[xpix,ypix],'lanczos2');
 		end
 
-		% plots image and saliency map
+		%% Plot the image with a salience map overlay 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function hm = get_heatmap(self)
 			img = imread(self.fname);
 			params = makeGBVSParams;
@@ -223,6 +239,8 @@ classdef Trial < handle
 			hm = heatmap_overlay(img,saliency_map.master_map_resized);
 		end
 
+		%% Compute GBVS salience for each fixation 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function compute_fixation_salience(self)
 			img = imread(self.fname);
 			params = makeGBVSParams;
@@ -237,6 +255,9 @@ classdef Trial < handle
 			end
 		end
 
+		%% Given temperature at the two loops, assign the trial into 
+		%% control/inactivation conditions 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function assign_condition(obj)
 			max_temp = max(obj.temp1, obj.temp2);
 			if max_temp < -30000 || max_temp > 30 
@@ -246,7 +267,9 @@ classdef Trial < handle
 			end
 		end
 
-		% plot image and raw fixation points
+		%% Plot the image and fixations, coloring saccades by number
+		%% in sequence
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function plot_fixations(self, mode)
 			
 			% compute heatmap overlay
@@ -283,7 +306,8 @@ classdef Trial < handle
 			end
 		end
 
-		% plot image and raw fixation points
+		%% Plot the image and fixations, coloring saccades by left/right 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function lr_test(obj)
 			
 			% compute heatmap overlay
@@ -307,6 +331,9 @@ classdef Trial < handle
 			end
 		end
 
+		%% Shallow initialization: copy values from the provided
+		%% trial information 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function trivial_init(obj, trial_info)
 			obj.temp1 = trial_info.Temperature1;
 			obj.temp2 = trial_info.Temperature2;
@@ -317,6 +344,9 @@ classdef Trial < handle
 			obj.image_end = trial_info.ImageEnd;
 		end
 
+		%% After Saccade and Fixation objects have been made, add 
+		%% next/prev pointers 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function assign_fixations_saccades(obj)
 			cum_dist = 0;
 			for fix_idx = 1:obj.n_fixations
@@ -345,6 +375,8 @@ classdef Trial < handle
 			end
 		end
 
+		%% Given the fixation table, create all the Fixation objects 
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function parse_fixation_table(obj,fix_tbl,blink_tbl)
 			% scrub any fixation within 100ms of blink
 			n_fixations = size(fix_tbl,1);
@@ -424,6 +456,8 @@ classdef Trial < handle
 			end
 		end
 
+		%% Initialize each saccade using its surrounding fixations
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function saccades = compute_saccades(obj)
 			
 			saccades = cell(length(obj.fixations)-1,1);
@@ -433,6 +467,18 @@ classdef Trial < handle
 				saccades{f-1} = Saccade(fix1,fix2);
 			end
 			obj.saccades = saccades;
+		end
+
+		%% For each fixation, sets the salience relative to the 
+		%% experiment's chance value
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		function set_percent_chance_salience(obj, chance_salience)
+			obj.chance_salience = chance_salience;
+			for f = 1:obj.n_fixations
+				obj.fixations{f}.percent_chance_salience = ...
+					obj.fixations{f}.salience / ...
+					chance_salience * 100;
+			end
 		end
 	end
 end

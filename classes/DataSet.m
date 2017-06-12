@@ -29,6 +29,11 @@ classdef DataSet
 
 			% compute chance salience
 			obj.chance_salience = get_chance_salience(trials);
+
+			% add percent_chance_salience to all trials
+			for t = 1:numel(trials)
+				trials{t}.set_percent_chance_salience(obj.chance_salience)
+			end
 		end
 
 		% get some subset of trials

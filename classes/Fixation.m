@@ -6,6 +6,7 @@ classdef Fixation < handle
 		duration
 		pupil
 		salience
+		percent_chance_salience
 
 		% positional
 		x

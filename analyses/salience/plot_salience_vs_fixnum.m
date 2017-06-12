@@ -26,10 +26,17 @@ function plot_salience_vs_fixnum(trialsvec, n_fix, direction, varargin)
 		trials = trialsvec{i};
 		%n_fix = check_n_fix(trials, n_fix, direction);
 
-		[scores{i}, distances{i}] = agg_fixation_scores(trials, n_fix, direction);
+		[scores{i}, distances{i}, indices{i}] = ...
+			agg_fixation_scores(trials, n_fix, direction);
 	end
 
-	plot_scores(distances, scores, colors);
+	%x_axis = distances;
+	%xaxstr = 'Cumulative Saccade Distance (px)';
+
+	x_axis = indices;
+	xaxstr = 'Saccade Index';
+
+	plot_scores(x_axis, xaxstr, scores, colors);
 
 end
 
@@ -53,9 +60,10 @@ function nf = check_n_fix(trials, nf, direction)
 	end
 end
 
-function [scores, distances] = agg_fixation_scores(trials, n_fix, direction)
+function [scores, distances, indices] = agg_fixation_scores(trials, n_fix, direction)
 	scores = zeros(length(trials),n_fix);
 	distances = zeros(length(trials),n_fix);
+	indices = zeros(length(trials),n_fix);
 	for i = 1:length(trials)
 		fixations = trials{i}.get_fixations(direction,'prev');
 		num_available = length(fixations);
@@ -63,18 +71,20 @@ function [scores, distances] = agg_fixation_scores(trials, n_fix, direction)
 		for j = 1:n_fix
 
 			if j <= num_available
-				scores(i,j) = fixations{j}.salience;
+				scores(i,j) = fixations{j}.percent_chance_salience;
 				distances(i,j) = fixations{j}.cumulative_distance;
+				indices(i,j) = j;
 			else
 				scores(i,j) = NaN;
 				distances(i,j) = NaN; 
+				indices(i,j) = NaN;
 			end
 		end
 
 	end
 end
 
-function plot_scores(distances, scores, colors)
+function plot_scores(x_axis, xaxstr, scores, colors)
 
 	n = numel(scores);
 	figure; hold on;
@@ -89,15 +99,15 @@ function plot_scores(distances, scores, colors)
 		n_valid = size(y,1) - n_nan;
 		sem = sd ./ sqrt(n_valid);
 
-		% average distances
-		x = distances{i};
+		% average x_axis
+		x = x_axis{i};
 		mnx = nanmean(x,1);
 
 		shadedErrorBar(mnx, mn, sem,...
 			{'color',colors(i,:)});
 	end
-	title('Salience vs. Cumulative Saccade Distance');
-	ylabel('Salience');
-	xlabel('Cumulative Saccade Distance (px)');
+	title(sprintf('Salience vs. %s',xaxstr));
+	ylabel('Salience (% Chance)');
+	xlabel(xaxstr);
 
 end
