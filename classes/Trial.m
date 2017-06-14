@@ -21,7 +21,8 @@ classdef Trial < handle
 		fixations
 		n_fixations
 		baseline_fixation % time after fixation onset and before image onset
-		chance_salience
+		gbvs_chance_salience
+		ik_chance_salience
 
 		% saccades
 		saccades
@@ -60,7 +61,7 @@ classdef Trial < handle
 
 		%% For relevant fields, compute basic statistics 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		function stats = get_stats(self, direction, order)
+		function stats = get_stats(self, direction, order, salmethod, salscaling)
 			% direction can be '', 'left', or 'right'
 			% order can be 'next' or 'prev'
 
@@ -76,7 +77,7 @@ classdef Trial < handle
 			for i = 1:stats.n_fixations
 				durations(i) = fixations{i}.duration;
 				pupil_sizes(i) = fixations{i}.pupil;
-				saliences(i) = fixations{i}.percent_chance_salience;
+				saliences(i) = fixations{i}.get_salience(salmethod,salscaling);
 			end
 
 			% Fixation durations
@@ -239,21 +240,22 @@ classdef Trial < handle
 			hm = heatmap_overlay(img,saliency_map.master_map_resized);
 		end
 
-		%% Compute GBVS salience for each fixation 
+		%% Compute GBVS salience for each fixation -- very slow, I now
+		%% load in from .jpg salmaps in parse_fixation_table
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		function compute_fixation_salience(self)
-			img = imread(self.fname);
-			params = makeGBVSParams;
-			params.levels = [2, 3, 5, 6, 7, 8, 9]; % from Xiaomo
-			saliency_map = gbvs(img, params);
+		%function compute_fixation_salience(self)
+			%img = imread(self.fname);
+			%params = makeGBVSParams;
+			%params.levels = [2, 3, 5, 6, 7, 8, 9]; % from Xiaomo
+			%saliency_map = gbvs(img, params);
 
-			% assign salience to each fix
-			for f = 1:length(self.fixations)
-				x = floor(self.fixations{f}.x);
-				y = floor(self.fixations{f}.y);
-				self.fixations{f}.salience = saliency_map.master_map_resized(y,x);
-			end
-		end
+			%% assign salience to each fix
+			%for f = 1:length(self.fixations)
+				%x = floor(self.fixations{f}.x);
+				%y = floor(self.fixations{f}.y);
+				%self.fixations{f}.salience = saliency_map.master_map_resized(y,x);
+			%end
+		%end
 
 		%% Given temperature at the two loops, assign the trial into 
 		%% control/inactivation conditions 
@@ -428,7 +430,11 @@ classdef Trial < handle
 			base = '~/moorelab/parietal_inactivation/data/QuitoImagesExp';
 			gbvs_str = sprintf('%s%d/saliency_maps/gbvs_A%d.jpg',...
 				base, obj.exp_num, obj.figure_number);
+			ik_str = sprintf('%s%d/saliency_maps/ik_A%d.jpg',...
+				base, obj.exp_num, obj.figure_number);
+
 			salmap = imread(gbvs_str);
+			ik_salmap = imread(ik_str);
 
 			% Keep any fixations after image onset
 			start_after_image_onset = fix_tbl.FixationStart >= obj.image_on;
@@ -447,7 +453,7 @@ classdef Trial < handle
 
 			for i = 1:n_fixations
 				fixations{i} = Fixation(fix_tbl(i,:),...
-					x0,y0,salmap');
+					x0,y0,salmap',ik_salmap');
 			end
 			obj.fixations = fixations;
 
@@ -474,12 +480,17 @@ classdef Trial < handle
 		%% For each fixation, sets the salience relative to the 
 		%% experiment's chance value
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		function set_percent_chance_salience(obj, chance_salience)
-			obj.chance_salience = chance_salience;
+		function set_percent_chance_salience(obj, gbvs, ik)
+			obj.gbvs_chance_salience = gbvs; 
+			obj.ik_chance_salience = ik; 
 			for f = 1:obj.n_fixations
-				obj.fixations{f}.percent_chance_salience = ...
-					obj.fixations{f}.salience / ...
-					chance_salience * 100;
+				obj.fixations{f}.gbvs_percent_chance_salience = ...
+					obj.fixations{f}.gbvs_salience / ...
+					gbvs * 100;
+
+				obj.fixations{f}.ik_percent_chance_salience = ...
+					obj.fixations{f}.ik_salience / ...
+					ik * 100;
 			end
 		end
 	end

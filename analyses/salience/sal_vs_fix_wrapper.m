@@ -1,4 +1,4 @@
-function sal_vs_fix_wrapper(datasets, direction, mode)
+function sal_vs_fix_wrapper(datasets, direction, mode, salmethod, salscaling);
 
 	n_fix = 3;
 	blue = [.161, .310, .427];
@@ -13,7 +13,7 @@ function sal_vs_fix_wrapper(datasets, direction, mode)
 		inactivation_trials = aggregate_trials(datasets,'inactivation');
 
 		trialvec = {control_trials; inactivation_trials};
-		plot_salience_vs_fixnum(trialvec, n_fix, direction, colors2);
+		plot_salience_vs_fixnum(trialvec, n_fix, direction, salmethod, salscaling, colors2);
 	case 'pair_aggregate'
 		n_d = length(datasets);
 
@@ -34,6 +34,6 @@ function sal_vs_fix_wrapper(datasets, direction, mode)
 		inactivation_trials = all_pairs(:,2);
 
 		trialvec = {control_trials; inactivation_trials};
-		plot_salience_vs_fixnum(trialvec, n_fix, direction, colors2);
+		plot_salience_vs_fixnum(trialvec, n_fix, direction, salmethod, salscaling, colors2);
 	end
 end

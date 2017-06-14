@@ -5,8 +5,12 @@ classdef Fixation < handle
 		end_time
 		duration
 		pupil
-		salience
-		percent_chance_salience
+
+		% salience
+		gbvs_salience
+		ik_salience
+		gbvs_percent_chance_salience
+		ik_percent_chance_salience
 
 		% positional
 		x
@@ -24,7 +28,7 @@ classdef Fixation < handle
 
 	methods
 		% Constructor
-		function obj = Fixation(fix_row,x0,y0,salmap)
+		function obj = Fixation(fix_row,x0,y0,salmap,ik_salmap)
 			obj.start_time = fix_row.FixationStart;
 			obj.end_time = fix_row.FixationEnd;
 			obj.duration = fix_row.FixationLength;
@@ -37,9 +41,11 @@ classdef Fixation < handle
 			sal_y = floor(obj.y) + 1; % +1 because matlab is 1-indexed
 
 			if (sal_x <= 0 || sal_y <= 0)
-				obj.salience = 0;
+				obj.gbvs_salience = 0;
+				obj.ik_salience = 0;
 			else
-				obj.salience = double(salmap(sal_x,sal_y));
+				obj.gbvs_salience = double(salmap(sal_x,sal_y));
+				obj.ik_salience = double(ik_salmap(sal_x,sal_y));
 			end
 
 			obj.dx = obj.x - x0;
@@ -47,6 +53,34 @@ classdef Fixation < handle
 
 			obj.cx = obj.dx + 1920/2;
 			obj.cy = obj.dy + 1080/2;
+		end
+
+		%% Gets salience, depending on which method and scaled or not
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		function sal = get_salience(self, method, scaling)
+
+			switch scaling
+			case 'raw'
+				switch lower(method)
+				case 'gbvs'
+					sal = self.gbvs_salience;
+				case 'ik'
+					sal = self.ik_salience;
+				otherwise
+					error(sprintf('%s not recognized. Try ''gbvs'' or ''ik''', method));
+				end
+			case 'scaled'
+				switch lower(method)
+				case 'gbvs'
+					sal = self.gbvs_percent_chance_salience;
+				case 'ik'
+					sal = self.ik_percent_chance_salience;
+				otherwise
+					error(sprintf('%s not recognized. Try ''gbvs'' or ''ik''', method));
+				end
+			otherwise
+				error(sprintf('%s not recognized. Try ''raw'' or ''scaled''', scaling));
+			end
 		end
 	end
 end

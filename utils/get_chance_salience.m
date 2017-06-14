@@ -1,9 +1,10 @@
-function chance_salience = get_chance_salience(trials)
+function chance_salience = get_chance_salience(trials, method)
 %GET_CHANCE_SALIENCE computes the average salience one would expect by chance
 % if fixations are randomly assigned to salience maps
 %
 % Inputs
 %	trials - a cell vector of Trial objects to consider
+%	method - either 'gbvs' or 'ik'
 %
 % Outputs
 %	chance_salience - the average salience expected by random assignment of
@@ -30,8 +31,8 @@ function chance_salience = get_chance_salience(trials)
 		delims = {'.','/'};
 		parts = split(fname,delims);
 
-		salmap_fname = sprintf('/Users/eshed/moorelab/parietal_inactivation/%s/%s/saliency_maps/gbvs_%s.jpg',parts{1},...
-			parts{2},parts{4});
+		salmap_fname = sprintf('/Users/eshed/moorelab/parietal_inactivation/%s/%s/saliency_maps/%s_%s.jpg',parts{1},...
+			parts{2},method,parts{4});
 		salmap = imread(salmap_fname);
 
 

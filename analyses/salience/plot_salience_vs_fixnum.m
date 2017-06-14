@@ -1,4 +1,4 @@
-function plot_salience_vs_fixnum(trialsvec, n_fix, direction, varargin)
+function plot_salience_vs_fixnum(trialsvec, n_fix, direction, method, scaling, varargin)
 % PLOT_SALIENCE_VS_FIXNUM plots salience of fixations against the number of the
 % fixation
 % Inputs
@@ -28,7 +28,7 @@ function plot_salience_vs_fixnum(trialsvec, n_fix, direction, varargin)
 		%n_fix = check_n_fix(trials, n_fix, direction);
 
 		[scores{i}, distances{i}, indices{i}] = ...
-			agg_fixation_scores(trials, n_fix, direction);
+			agg_fixation_scores(trials, n_fix, direction, method, scaling);
 	end
 
 	%% Plotting raw traces
@@ -65,7 +65,7 @@ function nf = check_n_fix(trials, nf, direction)
 	end
 end
 
-function [scores, distances, indices] = agg_fixation_scores(trials, n_fix, direction)
+function [scores, distances, indices] = agg_fixation_scores(trials, n_fix, direction, method, scaling)
 	scores = zeros(length(trials),n_fix);
 	distances = zeros(length(trials),n_fix);
 	indices = zeros(length(trials),n_fix);
@@ -76,7 +76,7 @@ function [scores, distances, indices] = agg_fixation_scores(trials, n_fix, direc
 		for j = 1:n_fix
 
 			if j <= num_available
-				scores(i,j) = fixations{j}.percent_chance_salience;
+				scores(i,j) = fixations{j}.get_salience(method, scaling);
 				distances(i,j) = fixations{j}.cumulative_distance;
 				indices(i,j) = j;
 			else

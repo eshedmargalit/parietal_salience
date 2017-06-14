@@ -1,11 +1,13 @@
-function [stats, props, titles, ylabels] = trial_stats(trials, direction, order, label)
+function [stats, props, titles, ylabels] = trial_stats(trials, direction, order, salmethod, salscaling, label)
 %TRIAL_STATS produces statistics for relevant fields of the Trial object (see preproc/Trial.m)
 %
 % Inputs
 %	trials - a cell array of Trial objects to be summarized
 %	direction - '', 'left', or 'right'
 %	order - '', 'prev' or 'next'
-%	str - a label to be used on figures
+%	salmethod - 'gbvs' or 'ik'
+%	salscaling - 'raw' or 'scaled'
+%	label - a label to be used on figures
 %
 % Outputs
 %	stats - a struct of structs, each represeting a property of Trial 
@@ -35,7 +37,7 @@ function [stats, props, titles, ylabels] = trial_stats(trials, direction, order,
 	% populate raw vectors
 	for i = 1:n
 		trial = trials{i};
-		tstats = trial.get_stats(direction, order);
+		tstats = trial.get_stats(direction, order, salmethod, salscaling);
 
 		for s = 1:numel(props)
 			str = props{s};

@@ -11,7 +11,8 @@ classdef DataSet
 		exp_num
 		name 
 
-		chance_salience
+		gbvs_chance_salience
+		ik_chance_salience
 	end
 
 	methods
@@ -28,11 +29,13 @@ classdef DataSet
 			obj.exp_num = exp_num;
 
 			% compute chance salience
-			obj.chance_salience = get_chance_salience(trials);
+			obj.gbvs_chance_salience = get_chance_salience(trials, 'gbvs');
+			obj.ik_chance_salience = get_chance_salience(trials, 'ik');
 
 			% add percent_chance_salience to all trials
 			for t = 1:numel(trials)
-				trials{t}.set_percent_chance_salience(obj.chance_salience)
+				trials{t}.set_percent_chance_salience(obj.gbvs_chance_salience, ...
+					obj.ik_chance_salience);
 			end
 		end
 
