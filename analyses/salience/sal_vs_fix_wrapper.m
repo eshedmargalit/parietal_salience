@@ -1,6 +1,6 @@
 function sal_vs_fix_wrapper(datasets, direction, mode)
 
-	n_fix = 10;
+	n_fix = 3;
 	blue = [.161, .310, .427];
 	red = [.667, .224, .224];
 

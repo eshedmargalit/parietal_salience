@@ -274,6 +274,7 @@ classdef Trial < handle
 			
 			% compute heatmap overlay
 			hm = self.get_heatmap();
+			figure();
 			imshow(hm); hold on;
 			
 			fixations = self.fixations;
@@ -312,6 +313,7 @@ classdef Trial < handle
 			
 			% compute heatmap overlay
 			hm = obj.get_heatmap();
+			figure();
 			imshow(hm); hold on;
 			
 			saccades = obj.saccades;
