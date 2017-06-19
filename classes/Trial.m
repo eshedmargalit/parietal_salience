@@ -21,8 +21,12 @@ classdef Trial < handle
 		fixations
 		n_fixations
 		baseline_fixation % time after fixation onset and before image onset
+		center_of_mass % mean of fixation x positions
+
+
 		gbvs_chance_salience
 		ik_chance_salience
+		average_salience
 
 		% saccades
 		saccades
@@ -57,6 +61,9 @@ classdef Trial < handle
 
 			% assign saccades to fixations
 			assign_fixations_saccades(obj);
+
+			% set global salience parameters
+			set_global_salience(obj);
 		end
 
 		%% For relevant fields, compute basic statistics 
@@ -389,6 +396,36 @@ classdef Trial < handle
 			end
 		end
 
+		%% set average_salience.(method).left, average_salience.right, and average_salience.left_preference
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		function set_global_salience(obj)
+			base = '~/moorelab/parietal_inactivation/data/QuitoImagesExp';
+			gbvs_str = sprintf('%s%d/saliency_maps/gbvs_A%d.jpg',...
+				base, obj.exp_num, obj.figure_number);
+			ik_str = sprintf('%s%d/saliency_maps/ik_A%d.jpg',...
+				base, obj.exp_num, obj.figure_number);
+
+			gbvs_salmap = imread(gbvs_str)'; % transpose for (x by y)
+			ik_salmap = imread(ik_str)';
+
+			average_salience = struct();
+			average_salience.gbvs = struct();
+			average_salience.ik = struct();
+
+			average_salience.gbvs.left = mean2(gbvs_salmap(1:(1920/2),:));
+			average_salience.gbvs.right = mean2(gbvs_salmap((1920/2):end,:));
+			average_salience.gbvs.left_preference = ...
+				average_salience.gbvs.left - average_salience.gbvs.right; 
+
+			average_salience.ik.left = mean2(ik_salmap(1:(1920/2),:));
+			average_salience.ik.right = mean2(ik_salmap((1920/2):end,:));
+			average_salience.ik.left_preference = ...
+				average_salience.ik.left - average_salience.ik.right; 
+
+			obj.average_salience = average_salience;
+		end
+
+
 		%% Given the fixation table, create all the Fixation objects 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		function parse_fixation_table(obj,fix_tbl,blink_tbl)
@@ -472,6 +509,14 @@ classdef Trial < handle
 			else
 				obj.baseline_fixation = fix0;
 			end
+
+			% compute center of mass of fixations
+			xs = zeros(n_fixations,1);
+			for i = 1:n_fixations
+				xs(i) = fixations{i}.cx;
+			end
+			obj.center_of_mass = mean(xs);
+
 		end
 
 		%% Initialize each saccade using its surrounding fixations
