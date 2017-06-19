@@ -73,11 +73,13 @@ classdef Trial < handle
 			durations = zeros(stats.n_fixations,1);
 			pupil_sizes = zeros(stats.n_fixations,1);
 			saliences = zeros(stats.n_fixations,1);
+			xs = zeros(stats.n_fixations,1);
 
 			for i = 1:stats.n_fixations
 				durations(i) = fixations{i}.duration;
 				pupil_sizes(i) = fixations{i}.pupil;
 				saliences(i) = fixations{i}.get_salience(salmethod,salscaling);
+				xs(i) = fixations{i}.cx;
 			end
 
 			% Fixation durations
@@ -101,10 +103,18 @@ classdef Trial < handle
 			stats.saliences.sem = stats.saliences.sd...
 				./ sqrt(stats.n_fixations);
 
+			% Mean Xs
+			stats.xs = struct();
+			stats.xs.mn = mean(xs);
+			stats.xs.sd = std(xs);
+			stats.xs.sem = stats.xs.sd...
+				./ sqrt(stats.n_fixations);
+
 			% For ease of access, store means separately
 			stats.fixation_durations_mn = stats.fixation_durations.mn;
 			stats.pupil_sizes_mn = stats.pupil_sizes.mn;
 			stats.saliences_mn = stats.saliences.mn;
+			stats.xs_mn = stats.xs.mn;
 
 		end
 

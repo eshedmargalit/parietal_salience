@@ -38,12 +38,18 @@ function plot_stats(statvec, ttest_pairs, is_paired, varargin)
 		ps = do_ttests(xs, ttest_pairs, strs, is_paired);
 
 		% Plot custom bar plot
-		bare(xs,ps,ttest_pairs,strs,colors);
+		switch field
+		case 'xs_mn'
+			bare(xs,ps,ttest_pairs,strs,colors, 1920/2);
+		otherwise
+			bare(xs,ps,ttest_pairs,strs,colors,[]);
+		end
+
 	end
 end
 
 
-function bare(xs,ps,ttest_pairs,strs,colors)
+function bare(xs,ps,ttest_pairs,strs,colors,horizontal_line)
 % BARE custom bar plot function
 % Inputs
 %	xs - cell array of statistic structures
@@ -118,6 +124,12 @@ function bare(xs,ps,ttest_pairs,strs,colors)
 		end
 		text(mean([idx1, idx2]), txt_height, starstr, 'FontSize', 24);
 	end
+
+	% draw horizontal line, if provided
+	if ~isempty(horizontal_line)
+		plot(xlim,[horizontal_line, horizontal_line],'k--');
+	end
+
 
 end
 
