@@ -24,10 +24,10 @@ classdef Saccade < handle
 			obj.next_fixation = fixation2;
 
 			% distance
-			x1 = fixation1.x;
-			x2 = fixation2.x;
-			y1 = fixation1.y;
-			y2 = fixation2.y;
+			x1 = fixation1.cx;
+			x2 = fixation2.cx;
+			y1 = fixation1.cy;
+			y2 = fixation2.cy;
 
 			obj.xs = [x1 x2];
 			obj.ys = [y1 y2];
