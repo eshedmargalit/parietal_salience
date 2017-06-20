@@ -61,9 +61,6 @@ classdef Trial < handle
 
 			% assign saccades to fixations
 			assign_fixations_saccades(obj);
-
-			% set global salience parameters
-			set_global_salience(obj);
 		end
 
 		%% For relevant fields, compute basic statistics 
@@ -398,7 +395,7 @@ classdef Trial < handle
 
 		%% set average_salience.(method).left, average_salience.right, and average_salience.left_preference
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		function set_global_salience(obj)
+		function set_global_salience(obj, gbvs_chance_sal, ik_chance_sal)
 			base = '~/moorelab/parietal_inactivation/data/QuitoImagesExp';
 			gbvs_str = sprintf('%s%d/saliency_maps/gbvs_A%d.jpg',...
 				base, obj.exp_num, obj.figure_number);
@@ -421,6 +418,27 @@ classdef Trial < handle
 			average_salience.ik.right = mean2(ik_salmap((1920/2):end,:));
 			average_salience.ik.left_preference = ...
 				average_salience.ik.left - average_salience.ik.right; 
+
+
+			method_strs = {'gbvs','ik'};
+			chance_sals = [gbvs_chance_sal, ik_chance_sal];
+
+			for i =1:2
+				method_str = method_strs{i};
+				chance = chance_sals(i);
+
+				average_salience.(method_str).left_percent_chance = ...
+					average_salience.(method_str).left / ...
+					chance * 100;
+
+				average_salience.(method_str).right_percent_chance = ...
+					average_salience.(method_str).right / ...
+					chance * 100;
+
+				average_salience.(method_str).left_preference_percent_chance = ...
+					average_salience.(method_str).left_preference / ...
+					chance * 100;
+			end
 
 			obj.average_salience = average_salience;
 		end
