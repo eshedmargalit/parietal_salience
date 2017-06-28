@@ -5,6 +5,9 @@ The following documentation describes the analysis suite developed by Eshed
 for use in analyzing behavior during the FreeView task performed by subjects
 in the Moore Lab.
 
+### Use
+To use the functions, just launch MATLAB from the repository root (where startup.m is). You will need to provide your own data, and it must be appropriately formatted.
+
 ### Data
 
 Where possible, data is organized in an object-oriented fashion. See the 'classes'
@@ -21,52 +24,67 @@ Practically, the entire hierarchy of objects is managed by a top-level cell-arra
 
 Sequences such as the following exemplify the design philosophy:
 
+```
 datasets{1}.trials{4}.saccades{6}.next_fixation.gbvs_percent_chance_salience
+```
 
 ### Methods
 
 A variety of class methods exist to facilitate simple access. Among the most commonly used
 are
 
-1. DataSet.get_trials(trial_type), where trial_type can be 'control' or 'inactivation'
-2. Trial.get_fixations('left','next'), this call would retrieve all fixations where the
+1. ```DataSet.get_trials(trial_type)```, where trial_type can be 'control' or 'inactivation'
+2. ```Trial.get_fixations('left','next')```, this call would retrieve all fixations where the
 next saccade was to the left on the given Trial
 
 
 ### Pre-Baked Analyses
 
-Listing of available analyses:
+Listing of pre-built analyses:
 
-1. trial_stats_wrapper: for each dataset provided, compares selected statistics for each trial (e.g., fixation_length, pupil size)
+1. *trial_stats_wrapper*: for each dataset provided, compares selected statistics for each trial (e.g., fixation_length, pupil size)
 
-2. trial_stats_wrapper_global_position: Same as (1), but 'left' and 'right' correspond to global left/right, where left corresponds to all pixels on the left half of the image.
+2. *m_seq_wrapper*: for each dataset (or for all datasets combined if 'aggregate' is used as mode), plots the m_sequence (saccade duration vs. pixels spanned)
 
-3. m_seq_wrapper: for each dataset (or for all datasets combined if 'aggregate' is used as mode), plots the m_sequence (saccade duration vs. pixels spanned)
+3. *sal_vs_fix_wrapper*: plots salience against fixation number, optionally does permutation testing for control/cooling differences
 
-4. sal_vs_fix_wrapper: plots salience against fixation number, optionally does permutation testing for control/cooling differences
+4. *compare_centered_raw*: for a given dataset and trial, compare the raw and cetnered fixation trajectories
 
-5. compare_centered_raw: for a given dataset and trial, compare the raw and cetnered fixation trajectories
+5. *temperature_histrogram*: plots a 2d histogram of the two temperatures in a given dataset
 
-6. temperature_histrogram: plots a 2d histogram of the two temperatures in a given dataset
+6. *compare_auc*: compare area-under-ROC-curve for different salience map formulations
 
-7. compare_auc: compare area-under-ROC-curve for different salience map formulations
+7. *saccade_magnitude_distribution*: does a histogram binning of saccade magnitudes for a subset of trials
 
-8. saccade_magnitude_distribution: does a histogram binning of saccade magnitudes for a subset of trials
+### Misc
 
-====================
+To avoid cluttering the trial statistics readout, the file docs/trial_stats.txt can be used to specify which fields to display, and which labels to use with them.
 
-Useful utilities:
+### Useful Utilities
+These functions are used throughout the codebase to save time.
 
 From File Exchange:
 
-1. hist2d and Plot2dHist
+1. *hist2d* and *Plot2dHist*
 
-2. shadedErrorBar
+2. *shadedErrorBar*
 
 Custom:
 
-1. make_saliency_maps: rough file to loop over all images and compute GBVS maps
+1. *make_saliency_maps*: rough file to loop over all images and compute GBVS maps
 
-2. load_experiments: for all (or a subset of) experiments, create a DataSet object from each. This should probably be your starting point for every analysis.
+2. *load_experiments*: for all (or a subset of) experiments, create a DataSet object from each. This should probably be your starting point for every analysis.
 
-3. aggregate_trials: given some group of datasets, smush all trials of a given type together
+3. *aggregate_trials*: given some group of datasets, smush all trials of a given type together
+
+4. *pair_aggregate_trials*: same as aggregate_trials, but ignores trials that don't have a valid control/inactivation pair
+
+5. *get_fixation_positions*: return all xs and ys from a vector of fixations
+
+6. *make_density_maps*: create fixation density maps by downsampling and upsampling binary fixation maps
+
+7. *make_fixation_maps*: creates an image-like matrix of zeros, except where a fixation was made
+
+8. *get_chance_salience*: for an experiment, determine the salience expected by chance (e.g., shuffle fixation targets and saliency maps)
+
+9. *parse_desired_stats*: reads docs/trial_stats.txt and returns the desired properties, figure titles, and ylabels 
