@@ -78,6 +78,13 @@ classdef Fixation < handle
 				otherwise
 					error(sprintf('%s not recognized. Try ''gbvs'' or ''ik''', method));
 				end
+			case 'duration_weighted'
+				switch lower(method)
+				case 'gbvs'
+					sal = self.gbvs_percent_chance_salience * self.duration;
+				case 'ik'
+					sal = self.ik_percent_chance_salience * self.duration;
+				end
 			otherwise
 				error(sprintf('%s not recognized. Try ''raw'' or ''scaled''', scaling));
 			end
