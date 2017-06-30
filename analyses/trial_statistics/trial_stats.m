@@ -55,8 +55,46 @@ function [stats, props, titles, ylabels] = trial_stats(trials, direction, order,
 		stats.(str).sem = stats.(str).sd ./ sqrt(n);
 		stats.(str).title = titles{s};
 		stats.(str).ylabel = ylabels{s};
+
+		% dirty fix for ylabel inflexibility with salmethods
+		if strcmp(str, 'saliences_mn')
+			stats.(str).title = get_salstring(salmethod, salscaling);
+			stats.(str).ylabel = get_salstring(salmethod, salscaling);
+		end
 	end
 
 	% Slap a label on it
 	stats.label = label;
+end
+
+function retval =  get_salstring(method, scaling)
+	switch scaling
+	case 'raw'
+		switch lower(method)
+		case 'gbvs'
+			retval = 'GBVS Raw Salience';
+		case 'ik'
+			retval = 'Itti-Koch Raw Salience';
+		case 'sam'
+			retval = 'SAM Raw Salience';
+		end
+	case 'scaled'
+		switch lower(method)
+		case 'gbvs'
+			retval = 'GBVS % Chance Salience';
+		case 'ik'
+			retval = 'Itti-Koch % Chance Salience';
+		case 'sam'
+			retval = 'SAM % Chance Salience';
+		end
+	case 'duration_weighted'
+		switch lower(method)
+		case 'gbvs'
+			retval = 'GBVS Duration-Weighted % Chance';
+		case 'ik'
+			retval = 'Itti-Koch Duration-Weighted % Chance';
+		case 'sam'
+			retval = 'SAM Duration-Weighted % Chance';
+		end
+	end
 end
