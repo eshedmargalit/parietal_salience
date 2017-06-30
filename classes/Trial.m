@@ -26,6 +26,7 @@ classdef Trial < handle
 
 		gbvs_chance_salience
 		ik_chance_salience
+		sam_chance_salience
 		average_salience
 
 		% saccades
@@ -395,19 +396,24 @@ classdef Trial < handle
 
 		%% set average_salience.(method).left, average_salience.right, and average_salience.left_preference
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		function set_global_salience(obj, gbvs_chance_sal, ik_chance_sal)
+		function set_global_salience(obj, gbvs_chance_sal, ik_chance_sal,...
+			sam_chance_sal)
 			base = '~/moorelab/parietal_inactivation/data/QuitoImagesExp';
 			gbvs_str = sprintf('%s%d/saliency_maps/gbvs_A%d.jpg',...
 				base, obj.exp_num, obj.figure_number);
 			ik_str = sprintf('%s%d/saliency_maps/ik_A%d.jpg',...
 				base, obj.exp_num, obj.figure_number);
+			sam_str = sprintf('%s%d/saliency_maps/sam_A%d.jpg',...
+				base, obj.exp_num, obj.figure_number);
 
 			gbvs_salmap = imread(gbvs_str)'; % transpose for (x by y)
 			ik_salmap = imread(ik_str)';
+			sam_salmap = imread(sam_str)';
 
 			average_salience = struct();
 			average_salience.gbvs = struct();
 			average_salience.ik = struct();
+			average_salience.sam = struct();
 
 			average_salience.gbvs.left = mean2(gbvs_salmap(1:(1920/2),:));
 			average_salience.gbvs.right = mean2(gbvs_salmap((1920/2):end,:));
@@ -419,9 +425,13 @@ classdef Trial < handle
 			average_salience.ik.left_preference = ...
 				average_salience.ik.left - average_salience.ik.right; 
 
+			average_salience.sam.left = mean2(sam_salmap(1:(1920/2),:));
+			average_salience.sam.right = mean2(sam_salmap((1920/2):end,:));
+			average_salience.sam.left_preference = ...
+				average_salience.sam.left - average_salience.sam.right; 
 
-			method_strs = {'gbvs','ik'};
-			chance_sals = [gbvs_chance_sal, ik_chance_sal];
+			method_strs = {'gbvs','ik','sam'};
+			chance_sals = [gbvs_chance_sal, ik_chance_sal, sam_chance_sal];
 
 			for i =1:2
 				method_str = method_strs{i};
@@ -497,9 +507,12 @@ classdef Trial < handle
 				base, obj.exp_num, obj.figure_number);
 			ik_str = sprintf('%s%d/saliency_maps/ik_A%d.jpg',...
 				base, obj.exp_num, obj.figure_number);
+			sam_str = sprintf('%s%d/saliency_maps/sam_A%d.jpg',...
+				base, obj.exp_num, obj.figure_number);
 
 			salmap = imread(gbvs_str);
 			ik_salmap = imread(ik_str);
+			sam_salmap = imread(sam_str);
 
 			% Keep any fixations after image onset
 			start_after_image_onset = fix_tbl.FixationStart >= obj.image_on;
@@ -518,7 +531,7 @@ classdef Trial < handle
 
 			for i = 1:n_fixations
 				fixations{i} = Fixation(fix_tbl(i,:),...
-					x0,y0,salmap',ik_salmap');
+					x0,y0,salmap',ik_salmap',sam_salmap');
 			end
 			obj.fixations = fixations;
 
@@ -553,9 +566,11 @@ classdef Trial < handle
 		%% For each fixation, sets the salience relative to the 
 		%% experiment's chance value
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		function set_percent_chance_salience(obj, gbvs, ik)
+		function set_percent_chance_salience(obj, gbvs, ik, sam)
 			obj.gbvs_chance_salience = gbvs; 
 			obj.ik_chance_salience = ik; 
+			obj.sam_chance_salience = sam;
+
 			for f = 1:obj.n_fixations
 				obj.fixations{f}.gbvs_percent_chance_salience = ...
 					obj.fixations{f}.gbvs_salience / ...
@@ -564,6 +579,10 @@ classdef Trial < handle
 				obj.fixations{f}.ik_percent_chance_salience = ...
 					obj.fixations{f}.ik_salience / ...
 					ik * 100;
+
+				obj.fixations{f}.sam_percent_chance_salience = ...
+					obj.fixations{f}.sam_salience / ...
+					sam * 100;
 			end
 		end
 	end

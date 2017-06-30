@@ -13,6 +13,7 @@ classdef DataSet
 
 		gbvs_chance_salience
 		ik_chance_salience
+		sam_chance_salience
 	end
 
 	methods
@@ -31,13 +32,16 @@ classdef DataSet
 			% compute chance salience
 			obj.gbvs_chance_salience = get_chance_salience(trials, 'gbvs');
 			obj.ik_chance_salience = get_chance_salience(trials, 'ik');
+			obj.sam_chance_salience = get_chance_salience(trials, 'sam');
 
 			% add percent_chance_salience to all trials
 			for t = 1:numel(trials)
 				trials{t}.set_percent_chance_salience(obj.gbvs_chance_salience, ...
-					obj.ik_chance_salience);
+					obj.ik_chance_salience,...
+					obj.sam_chance_salience);
 				trials{t}.set_global_salience(obj.gbvs_chance_salience, ...
-					obj.ik_chance_salience);
+					obj.ik_chance_salience,...
+					obj.sam_chance_salience);
 			end
 		end
 

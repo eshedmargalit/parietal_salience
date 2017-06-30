@@ -4,7 +4,7 @@ function chance_salience = get_chance_salience(trials, method)
 %
 % Inputs
 %	trials - a cell vector of Trial objects to consider
-%	method - either 'gbvs' or 'ik'
+%	method - either 'gbvs', 'ik', or 'sam'
 %
 % Outputs
 %	chance_salience - the average salience expected by random assignment of

@@ -9,8 +9,10 @@ classdef Fixation < handle
 		% salience
 		gbvs_salience
 		ik_salience
+		sam_salience
 		gbvs_percent_chance_salience
 		ik_percent_chance_salience
+		sam_percent_chance_salience
 
 		% positional
 		x
@@ -28,7 +30,7 @@ classdef Fixation < handle
 
 	methods
 		% Constructor
-		function obj = Fixation(fix_row,x0,y0,salmap,ik_salmap)
+		function obj = Fixation(fix_row,x0,y0,salmap,ik_salmap,sam_salmap)
 			obj.start_time = fix_row.FixationStart;
 			obj.end_time = fix_row.FixationEnd;
 			obj.duration = fix_row.FixationLength;
@@ -43,9 +45,11 @@ classdef Fixation < handle
 			if (sal_x <= 0 || sal_y <= 0)
 				obj.gbvs_salience = 0;
 				obj.ik_salience = 0;
+				obj.sam_salience = 0;
 			else
 				obj.gbvs_salience = double(salmap(sal_x,sal_y));
 				obj.ik_salience = double(ik_salmap(sal_x,sal_y));
+				obj.sam_salience = double(sam_salmap(sal_x,sal_y));
 			end
 
 			obj.dx = obj.x - x0;
@@ -66,8 +70,10 @@ classdef Fixation < handle
 					sal = self.gbvs_salience;
 				case 'ik'
 					sal = self.ik_salience;
+				case 'sam'
+					sal = self.sam_salience;
 				otherwise
-					error(sprintf('%s not recognized. Try ''gbvs'' or ''ik''', method));
+					error(sprintf('%s not recognized. Try ''gbvs'',''sam'', or ''ik''', method));
 				end
 			case 'scaled'
 				switch lower(method)
@@ -75,8 +81,10 @@ classdef Fixation < handle
 					sal = self.gbvs_percent_chance_salience;
 				case 'ik'
 					sal = self.ik_percent_chance_salience;
+				case 'sam'
+					sal = self.sam_percent_chance_salience;
 				otherwise
-					error(sprintf('%s not recognized. Try ''gbvs'' or ''ik''', method));
+					error(sprintf('%s not recognized. Try ''gbvs'',''sam'', or ''ik''', method));
 				end
 			case 'duration_weighted'
 				switch lower(method)
@@ -84,9 +92,11 @@ classdef Fixation < handle
 					sal = self.gbvs_percent_chance_salience * self.duration;
 				case 'ik'
 					sal = self.ik_percent_chance_salience * self.duration;
+				case 'sam'
+					sal = self.sam_percent_chance_salience * self.duration;
 				end
 			otherwise
-				error(sprintf('%s not recognized. Try ''raw'' or ''scaled''', scaling));
+				error(sprintf('%s not recognized. Try ''raw'', ''scaled'', or ''duration_weighted''', scaling));
 			end
 		end
 	end

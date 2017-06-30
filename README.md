@@ -21,6 +21,10 @@ Practically, the entire hierarchy of objects is managed by a top-level cell-arra
 ```
 	datasets = load_experiments();
 ```
+If you want to force a reload of the data sets, call
+```
+	datasets = load_experiments(2:11,1);
+```
 
 Sequences such as the following exemplify the design philosophy:
 
