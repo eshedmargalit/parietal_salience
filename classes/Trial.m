@@ -433,7 +433,7 @@ classdef Trial < handle
 			method_strs = {'gbvs','ik','sam'};
 			chance_sals = [gbvs_chance_sal, ik_chance_sal, sam_chance_sal];
 
-			for i =1:2
+			for i =1:numel(method_strs)
 				method_str = method_strs{i};
 				chance = chance_sals(i);
 
